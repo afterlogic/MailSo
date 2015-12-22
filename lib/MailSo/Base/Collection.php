@@ -1,6 +1,11 @@
 <?php
 
-/* -AFTERLOGIC LICENSE HEADER- */
+/*
+ * Copyright 2004-2015, AfterLogic Corp.
+ * Licensed under AGPLv3 license or AfterLogic license
+ * if commercial version of the product was purchased.
+ * See the LICENSE file for a full license statement.
+ */
 
 namespace MailSo\Base;
 
@@ -154,12 +159,12 @@ abstract class Collection
 	 * @return mixed | null
 	 * @return mixed
 	 */
-	public function &GetByIndex($mIndex)
+	public function &GetByIndex($iIndex)
 	{
 		$mResult = null;
-		if (\key_exists($mIndex, $this->aItems))
+		if (\key_exists($iIndex, $this->aItems))
 		{
-			$mResult = $this->aItems[$mIndex];
+			$mResult = $this->aItems[$iIndex];
 		}
 
 		return $mResult;
@@ -182,17 +187,4 @@ abstract class Collection
 
 		return $this;
 	}
-	
-	public function toResponseArray($aParameters = array())
-	{
-		$aNames = explode('\\', get_class($this));
-		$sObjectName = end($aNames);
-		
-		return array(
-			'@Object' => 'Collection/'.\CApiResponseManager::GetObjectName($sObjectName),
-			'@Count' => $this->Count(),
-			'@Collection' => \CApiResponseManager::GetResponseObject($this->CloneAsArray(), $aParameters)
-		);
-	}
-	
 }

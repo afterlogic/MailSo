@@ -1,6 +1,11 @@
 <?php
 
-/* -AFTERLOGIC LICENSE HEADER- */
+/*
+ * Copyright 2004-2015, AfterLogic Corp.
+ * Licensed under AGPLv3 license or AfterLogic license
+ * if commercial version of the product was purchased.
+ * See the LICENSE file for a full license statement.
+ */
 
 namespace MailSo\Mime;
 
@@ -282,13 +287,5 @@ class Email
 		}
 
 		return \trim($sReturn);
-	}
-	
-	public function toResponseArray($aParameters = array())
-	{
-		return array(
-			'DisplayName' => \MailSo\Base\Utils::Utf8Clear($this->GetDisplayName()),
-			'Email' => \MailSo\Base\Utils::Utf8Clear($this->GetEmail())
-		);		
 	}
 }
