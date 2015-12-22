@@ -429,6 +429,15 @@ class BodyStructure
 	}
 
 	/**
+	 * @return array
+	 */
+	public function GetAllParts()
+	{
+		return $this->SearchByCallback(function ()  {
+			return true;
+		});
+	}
+	/**
 	 * @param string $sMimeIndex
 	 *
 	 * @return \MailSo\Imap\BodyStructure
