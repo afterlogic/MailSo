@@ -249,6 +249,14 @@ class Email
 	{
 		return array($this->sDisplayName, $this->GetEmail($bIdn), $this->sRemark);
 	}
+	
+	public function toResponseArray()
+	{
+		return array(
+			'DisplayName' => $this->sDisplayName, 
+			'Email' => $this->GetEmail()
+		);
+	}
 
 	/**
 	 * @param bool $bConvertSpecialsName = false
