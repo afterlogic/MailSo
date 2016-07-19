@@ -20,6 +20,11 @@ class File implements \MailSo\Cache\DriverInterface
 	 * @var string
 	 */
 	private $sCacheFolder;
+	
+	/**
+	 * @var bool
+	 */
+	public $bRootDir = false;	
 
 	/**
 	 * @access private
@@ -116,7 +121,10 @@ class File implements \MailSo\Cache\DriverInterface
 		if (3 < \strlen($sKey))
 		{
 			$sKeyPath = \sha1($sKey);
-			$sKeyPath = \substr($sKeyPath, 0, 2).'/'.\substr($sKeyPath, 2, 2).'/'.$sKeyPath;
+			if (!$this->bRootDir)
+			{
+				$sKeyPath = \substr($sKeyPath, 0, 2).'/'.\substr($sKeyPath, 2, 2).'/'.$sKeyPath;
+			}
 
 			$sFilePath = $this->sCacheFolder.'/'.$sKeyPath;
 			if ($bMkDir && !\is_dir(\dirname($sFilePath)))
