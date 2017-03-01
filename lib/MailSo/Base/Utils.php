@@ -1204,6 +1204,10 @@ END;
 					\MailSo\Base\Utils::ClearArrayUtf8Values($mItem);
 					$aInput[$mKey] = $mItem;
 				}
+				else if (\is_resource($mItem))
+				{
+					unset($aInput[$mKey]);
+				}
 			}
 		}
 	}
