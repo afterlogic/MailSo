@@ -1718,6 +1718,31 @@ END;
 		return $bResult;
 	}
 
+
+	/**
+	 *
+	 * @param resource $fResource
+	 * @param int $iBufferLen = 8192
+	 *
+	 * @return bool
+	 */
+	public static function GetFilePart($fResource, $iPartLen = 8192, $iOffset = 0)
+	{
+		$bResult = false;
+		if (\is_resource($fResource))
+		{
+			@\fseek($fResource, $iOffset );
+			$sBuffer = @\fread($fResource, $iPartLen);
+			if (false !== $sBuffer)
+			{
+				echo $sBuffer;
+				$bResult = true;
+			}
+		}
+
+		return $bResult;
+	}
+
 	/**
 	 * @param resource $rRead
 	 * @param array $aWrite
