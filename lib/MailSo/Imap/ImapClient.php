@@ -187,9 +187,7 @@ class ImapClient extends \MailSo\Net\NetClient
 		{
 			
 			$this->writeLogException(
-				new \MailSo\Base\Exceptions\InvalidArgumentException(
-					'', \Aurora\System\Notifications::AuthError
-				),
+				new \MailSo\Base\Exceptions\InvalidArgumentException(),
 				\MailSo\Log\Enumerations\Type::ERROR, true);
 		}
 
@@ -287,8 +285,7 @@ class ImapClient extends \MailSo\Net\NetClient
 		catch (\MailSo\Imap\Exceptions\NegativeResponseException $oException)
 		{
 			$this->writeLogException(
-				new \MailSo\Imap\Exceptions\LoginBadCredentialsException(
-					$oException->GetResponses(), '', \Aurora\System\Notifications::AuthError, $oException),
+				new \MailSo\Imap\Exceptions\LoginBadCredentialsException(),
 				\MailSo\Log\Enumerations\Type::NOTICE, true);
 		}
 
