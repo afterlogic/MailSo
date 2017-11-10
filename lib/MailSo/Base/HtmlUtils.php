@@ -552,7 +552,8 @@ class HtmlUtils
 				}
 
 				foreach (array(
-					'load', 'blur', 'error', 'focus', 'formchange', 'change',
+					'load', 'blur', 'error', 'focus', 'formchange', 'change', 'start',
+					'copy', 'contextmenu', 'drag', 'cut', 'paste',
 					'click', 'dblclick', 'keydown', 'keypress', 'keyup',
 					'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup',
 					'move', 'resize', 'resizeend', 'resizestart', 'scroll', 'select', 'submit', 'upload'
@@ -561,17 +562,20 @@ class HtmlUtils
 					@$oElement->removeAttribute('on'.$sAttr);
 				}
 
-				if ($oElement->hasAttribute('href'))
+				$aNotJsAttrs = ['href', 'action'];
+				foreach ($aNotJsAttrs as $sAttrName)
 				{
-					$sHref = \trim($oElement->getAttribute('href'));
-					if (!\preg_match('/^(http[s]?|ftp|skype|mailto):/i', $sHref))
+					if ($oElement->hasAttribute($sAttrName))
 					{
-						$oElement->setAttribute('data-x-broken-href', $sHref);
-						$oElement->setAttribute('href', 'javascript:false');
-					}
-					else if ('a' === $sTagNameLower)
-					{
-						$oElement->setAttribute('rel', 'external');
+						$sHref = \trim($oElement->getAttribute($sAttrName));
+						if (substr($sHref, 0, 11) === 'javascript:')
+						{
+							$oElement->setAttribute($sAttrName, 'javascript:void(0)');
+						}
+						else if ('a' === $sTagNameLower)
+						{
+							$oElement->setAttribute('rel', 'external');
+						}
 					}
 				}
 
