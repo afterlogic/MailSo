@@ -1749,9 +1749,18 @@ class ImapClient extends \MailSo\Net\NetClient
 
 			if (\MailSo\Imap\Enumerations\ResponseStatus::OK !== $aResult[$iCnt - 1]->StatusOrIndex)
 			{
-				$this->writeLogException(
-					new Exceptions\NegativeResponseException($aResult),
-					\MailSo\Log\Enumerations\Type::WARNING, true);
+				if (isset($aResult[$iCnt - 1]->ResponseList[2][0]) && strtoupper($aResult[$iCnt - 1]->ResponseList[2][0]) === 'ALREADYEXISTS')
+				{
+					$this->writeLogException(
+						new \MailSo\Mail\Exceptions\AlreadyExistsFolder(),
+						\MailSo\Log\Enumerations\Type::WARNING, true);
+				}
+				else
+				{
+					$this->writeLogException(
+						new Exceptions\NegativeResponseException($aResult),
+						\MailSo\Log\Enumerations\Type::WARNING, true);
+				}
 			}
 		}
 
