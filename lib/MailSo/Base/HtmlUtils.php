@@ -206,7 +206,7 @@ class HtmlUtils
 			{
 				// skip
 			}
-			else if (\in_array($sName, array('background-image', 'background', 'list-style-image', 'content'))
+			else if (\in_array($sName, array('background-image', 'background', 'list-style-image', 'content', 'shape-outside', 'border-image', 'border-image-source', 'list-style', '-webkit-mask-image'))
 				&& \preg_match('/url[\s]?\(([^)]+)\)/im', $sValue, $aMatch) && !empty($aMatch[1]))
 			{
 				$sFullUrl = \trim($aMatch[0], '"\' ');
@@ -447,11 +447,22 @@ class HtmlUtils
 			}
 
 			$aNodes = $oDom->getElementsByTagName('*');
+			$aNodesToRemove = [];
 			foreach ($aNodes as /* @var $oElement \DOMElement */ $oElement)
 			{
 				if (\in_array(\strtolower($oElement->tagName), array('svg', 'head', 'link',
 					'base', 'meta', 'title', 'style', 'script', 'bgsound', 'keygen', 'source',
 					'object', 'embed', 'applet', 'mocha', 'iframe', 'frame', 'frameset', 'video', 'audio')) && isset($oElement->parentNode))
+				{
+					// can't remove them in the first loop becase some of nodes won't be removed.
+					// issue can be reproduced if html message is
+					// <meta><meta><meta><meta http-equiv="refresh" content="1; url=http://attacker.com">
+					$aNodesToRemove[] = $oElement;
+				}
+			}
+			foreach ($aNodesToRemove as $oElement)
+			{
+				if (isset($oElement->parentNode))
 				{
 					@$oElement->parentNode->removeChild($oElement);
 				}
@@ -659,6 +670,15 @@ class HtmlUtils
 					$oElement->setAttribute('style',
 						\MailSo\Base\HtmlUtils::ClearStyle($oElement->getAttribute('style'), $oElement, $bHasExternals,
 							$aFoundCIDs, $aContentLocationUrls, $aFoundedContentLocationUrls, $bDoNotReplaceExternalUrl, $fAdditionalExternalFilter));
+				}
+				
+				if ($oElement->hasAttribute('cursor'))
+				{
+					$sCursor = $oElement->getAttribute('style');
+					if (strpos($sCursor, 'url(') !== false)
+					{
+						$oElement->removeAttribute('cursor');
+					}
 				}
 			}
 
