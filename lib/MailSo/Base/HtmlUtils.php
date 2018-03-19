@@ -74,10 +74,10 @@ class HtmlUtils
 			$sBodyAttrs = $aMatch[1];
 		}
 
-		$sHtml = \preg_replace('/<body([^>]*)>/im', '', $sHtml);
-		$sHtml = \preg_replace('/<\/body>/im', '', $sHtml);
-		$sHtml = \preg_replace('/<html([^>]*)>/im', '', $sHtml);
-		$sHtml = \preg_replace('/<\/html>/im', '', $sHtml);
+		$sHtml = \preg_replace('/\s*<body([^>]*)>/im', '', $sHtml);
+		$sHtml = \preg_replace('/<\/body>\s*/im', '', $sHtml);
+		$sHtml = \preg_replace('/\s*<html([^>]*)>/im', '', $sHtml);
+		$sHtml = \preg_replace('/<\/html>\s*/im', '', $sHtml);
 
 		return $sHtml;
 	}
