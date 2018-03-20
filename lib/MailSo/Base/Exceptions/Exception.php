@@ -23,8 +23,9 @@ class Exception extends \Exception
 	 */
 	public function __construct($sMessage = '', $iCode = 0, $oPrevious = null)
 	{
-		$sMessage = 0 === strlen($sMessage) ? str_replace('\\', '-', get_class($this)).' ('.
-			basename($this->getFile()).' ~ '.$this->getLine().')' : $sMessage;
+		$sMessage = 0 === strlen($sMessage) ? str_replace('\\', '-', get_class($this))
+//			.' ('. basename($this->getFile()).' ~ '.$this->getLine().')' 
+				: $sMessage;
 
 		parent::__construct($sMessage, $iCode, $oPrevious);
 	}
