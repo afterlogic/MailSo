@@ -23,6 +23,21 @@ class Exception extends \Exception
 	 */
 	public function __construct($sMessage = '', $iCode = 0, $oPrevious = null)
 	{
+		if (is_array($aResponses))
+		{
+			$this->aResponses = $aResponses;
+			if (0 === strlen($sMessage))
+			{
+				foreach ($aResponses as $oResponse)
+				{
+					if ($oResponse instanceof \MailSo\Imap\Response)
+					{
+						$sMessage .= $oResponse->HumanReadable;
+					}
+				}
+
+			}
+		}
 		$sMessage = 0 === strlen($sMessage) ? str_replace('\\', '-', get_class($this))
 //			.' ('. basename($this->getFile()).' ~ '.$this->getLine().')' 
 				: $sMessage;
