@@ -36,10 +36,7 @@ class ResponseException extends \MailSo\Sieve\Exceptions\Exception
 			{
 				foreach ($aResponses as $oResponse)
 				{
-					if ($oResponse instanceof \MailSo\Imap\Response)
-					{
-						$sMessage .= $oResponse->HumanReadable;
-					}
+					$sMessage .= $oResponse->HumanReadable;
 				}
 
 			}
