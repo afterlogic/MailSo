@@ -29,12 +29,22 @@ class ResponseException extends \MailSo\Sieve\Exceptions\Exception
 	 */
 	public function __construct($aResponses = array(), $sMessage = '', $iCode = 0, $oPrevious = null)
 	{
-		parent::__construct($sMessage, $iCode, $oPrevious);
-
 		if (is_array($aResponses))
 		{
 			$this->aResponses = $aResponses;
-		}
+			if (0 === strlen($sMessage))
+			{
+				foreach ($aResponses as $oResponse)
+				{
+					if ($oResponse instanceof \MailSo\Imap\Response)
+					{
+						$sMessage .= $oResponse->HumanReadable;
+					}
+				}
+
+			}
+		}		
+		parent::__construct($sMessage, $iCode, $oPrevious);
 	}
 
 	/**
