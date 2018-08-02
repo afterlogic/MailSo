@@ -32,20 +32,18 @@ class ResponseException extends \MailSo\Imap\Exceptions\Exception
 		if (is_array($aResponses))
 		{
 			$this->aResponses = $aResponses;
-			if (0 === strlen($sMessage))
+			
+			if (empty($sMessage))
 			{
-				foreach ($aResponses as $oResponse)
+				foreach ($this->GetResponses() as $oResponse)
 				{
-					if ($oResponse instanceof \MailSo\Imap\Response)
-					{
-						$sMessage .= $oResponse->HumanReadable;
-					}
+					$sMessage .= $oResponse->ToLine();
 				}
-
 			}
-		}		
+		}
 		
 		parent::__construct($sMessage, $iCode, $oPrevious);
+
 	}
 
 	/**

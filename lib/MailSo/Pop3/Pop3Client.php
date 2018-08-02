@@ -123,7 +123,9 @@ class Pop3Client extends \MailSo\Net\NetClient
 		}
 		catch (\MailSo\Pop3\Exceptions\NegativeResponseException $oException)
 		{
-			$this->writeLogException($oException,
+			$this->writeLogException(
+				new \MailSo\Pop3\Exceptions\LoginBadCredentialsException(
+					$oException->GetResponses(), '', 0, $oException),
 				\MailSo\Log\Enumerations\Type::NOTICE, true);
 		}
 
@@ -305,7 +307,7 @@ class Pop3Client extends \MailSo\Net\NetClient
 		if ($sStatus != '+OK')
 		{
 			$this->writeLogException(
-				new \MailSo\Pop3\Exceptions\Exception($sMessage),
+				new Exceptions\NegativeResponseException(),
 				\MailSo\Log\Enumerations\Type::WARNING, true);
 		}
 

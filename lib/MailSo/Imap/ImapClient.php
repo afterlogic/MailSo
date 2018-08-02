@@ -285,7 +285,7 @@ class ImapClient extends \MailSo\Net\NetClient
 		catch (\MailSo\Imap\Exceptions\NegativeResponseException $oException)
 		{
 			$this->writeLogException(
-				new \MailSo\Imap\Exceptions\LoginBadCredentialsException($oException->GetResponses(), $oException->getMessage()),
+				new \MailSo\Imap\Exceptions\LoginBadCredentialsException($oException->GetResponses()),
 				\MailSo\Log\Enumerations\Type::NOTICE, true);
 		}
 
@@ -328,7 +328,7 @@ class ImapClient extends \MailSo\Net\NetClient
 		{
 			$this->writeLogException(
 				new \MailSo\Imap\Exceptions\LoginBadCredentialsException(
-					$oException->GetResponses(), $oException->getMessage(), 0, $oException),
+					$oException->GetResponses(), '', 0, $oException),
 				\MailSo\Log\Enumerations\Type::NOTICE, true);
 		}
 
@@ -444,7 +444,7 @@ class ImapClient extends \MailSo\Net\NetClient
 		if (false === $oReturn)
 		{
 			$this->writeLogException(
-				new \MailSo\Imap\Exceptions\ResponseException(),
+				new \MailSo\Imap\Exceptions\ResponseException($aResult),
 				\MailSo\Log\Enumerations\Type::ERROR, true);
 		}
 
@@ -1752,7 +1752,7 @@ class ImapClient extends \MailSo\Net\NetClient
 				if (isset($aResult[$iCnt - 1]->ResponseList[2][0]) && strtoupper($aResult[$iCnt - 1]->ResponseList[2][0]) === 'ALREADYEXISTS')
 				{
 					$this->writeLogException(
-						new \MailSo\Mail\Exceptions\AlreadyExistsFolder($aResult[$iCnt - 1]->HumanReadable),
+						new \MailSo\Mail\Exceptions\AlreadyExistsFolder(),
 						\MailSo\Log\Enumerations\Type::WARNING, true);
 				}
 				else
