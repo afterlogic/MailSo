@@ -108,7 +108,7 @@ class ImapClient extends \MailSo\Net\NetClient
 		$this->bIsSelected = false;
 		$this->sLogginedUser = '';
 
-		$this->__FORCE_SELECT_ON_EXAMINE__ = false;
+		$this->__FORCE_SELECT_ON_EXAMINE__ = true;
 
 		@\ini_set('xdebug.max_nesting_level', 500);
 	}
