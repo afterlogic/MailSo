@@ -187,7 +187,7 @@ class ImapClient extends \MailSo\Net\NetClient
 		{
 			
 			$this->writeLogException(
-				new \MailSo\Base\Exceptions\InvalidArgumentException(),
+				new \MailSo\Base\Exceptions\InvalidArgumentException('Can\'t login with empty password'),
 				\MailSo\Log\Enumerations\Type::ERROR, true);
 		}
 

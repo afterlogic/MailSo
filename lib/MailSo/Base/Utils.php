@@ -1213,23 +1213,33 @@ END;
 	}
 
 
-	public static function cleanDataForJson($branch){
-		if(is_object($branch)){
-			// object
-			$props = array();
-			$branch = clone($branch); // doesn't clone cause some issues?
-			foreach($branch as $k=>$v)
-				$branch->$k = self::cleanDataForJson($v);
-		}elseif(is_array($branch)){
-			// array
-			foreach($branch as $k=>$v)
-				$branch[$k] = self::cleanDataForJson($v);
-		}elseif(is_resource($branch) || !is_null(@get_resource_type($branch))){
-			// resource
-			$branch = (string)$branch.' ('.get_resource_type($branch).')';
-		//}elseif(is_string($branch)){
-			// string (ensure it is UTF-8, see: https://bugs.php.net/bug.php?id=47130)
-		//	$branch = utf8_encode($branch); //this brakes the correct utf8 text
+	public static function cleanDataForJson($branch)
+	{
+		if(!is_scalar($branch))
+		{
+			if(is_object($branch))
+			{
+				// object
+				$props = array();
+				$branch = clone($branch); // doesn't clone cause some issues?
+				foreach($branch as $k=>$v) 
+				{
+					$branch->$k = self::cleanDataForJson($v);
+				}
+			}
+			elseif(is_array($branch))
+			{
+				// array
+				foreach($branch as $k=>$v) 
+				{
+					$branch[$k] = self::cleanDataForJson($v);
+				}
+			}
+			elseif(is_resource($branch) || !is_null(@get_resource_type($branch)))
+			{
+				// resource
+				$branch = (string)$branch.' ('.get_resource_type($branch).')';
+			}
 		}
 		// other (hopefully serializable) stuff
 		return $branch;
