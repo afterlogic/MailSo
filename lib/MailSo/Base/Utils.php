@@ -2346,7 +2346,6 @@ END;
 		static $oIdn = null;
 		if (null === $oIdn)
 		{
-			include_once MAILSO_LIBRARY_ROOT_PATH.'Vendors/Net/IDNA2.php';
 			$oIdn = new \Net_IDNA2();
 		}
 
