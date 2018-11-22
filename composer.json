@@ -16,7 +16,8 @@
 	"autoload": {
         "psr-0" : {
             "MailSo\\": "lib/"
-        }
+		},
+		"files": ["lib/MailSo/MailSo.php"]
 	},
 	"extra": {
 		"branch-alias": {
