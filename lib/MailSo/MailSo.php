@@ -14,5 +14,3 @@ if (!\defined('MAILSO_LIBRARY_ROOT_PATH'))
 	\define('MAILSO_LIBRARY_ROOT_PATH', \defined('MAILSO_LIBRARY_USE_PHAR')
 		? 'phar://mailso.phar/' : \rtrim(\realpath(__DIR__), '\\/').'/');
 }
-
-}
