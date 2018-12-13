@@ -1215,7 +1215,7 @@ END;
 
 	public static function cleanDataForJson($branch)
 	{
-		if(!is_scalar($branch))
+		if(!is_scalar($branch) && !is_null($branch))
 		{
 			if(is_object($branch))
 			{
