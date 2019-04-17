@@ -1829,6 +1829,7 @@ END;
 					\MailSo\Base\Utils::ResetTimeLimit();
 				}
 			}
+			@\rewind($rRead);
 		}
 
 		if ($mResult && $bRewindOnComplete)

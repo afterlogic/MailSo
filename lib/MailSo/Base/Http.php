@@ -276,10 +276,11 @@ class Http
 		if (0 === \strlen($sResultHeader) &&
 			\MailSo\Base\Utils::FunctionExistsAndEnabled('apache_request_headers'))
 		{
-			$sHeaders = \apache_request_headers();
-			if (isset($sHeaders[$sHeader]))
+			$aHeaders = \array_change_key_case(\apache_request_headers());
+			$sLowervaseHeader = \strtolower($sHeader);
+			if (isset($aHeaders[$sLowervaseHeader]))
 			{
-				$sResultHeader = $sHeaders[$sHeader];
+				$sResultHeader = $aHeaders[$sLowervaseHeader];
 			}
 		}
 
