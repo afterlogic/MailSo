@@ -245,9 +245,6 @@ abstract class NetClient
 		$this->writeLog('Start connection to "'.$this->sConnectedHost.':'.$this->iConnectedPort.'"',
 			\MailSo\Log\Enumerations\Type::NOTE);
 
-//		$this->rConnect = @\fsockopen($this->sConnectedHost, $this->iConnectedPort,
-//			$iErrorNo, $sErrorStr, $this->iConnectTimeOut);
-
 		$bVerifySsl = !!$bVerifySsl;
 		$aStreamContextSettings = array(
 			'ssl' => array(
