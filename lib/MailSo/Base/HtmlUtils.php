@@ -291,9 +291,11 @@ class HtmlUtils
 	}
 
 	/**
+	 * Replaces text like address@domain with <a href="mailto:address@domain">address@domain</a> in the message body.
+	 * This method performs this replacement for HTML messages. In plain-text messages, links are always converted to <a>.
 	 * @param \DOMDocument $oDom
 	 */
-	public static function FindLinksInDOM(&$oDom)
+	public static function CreateHtmlLinksFromTextLinksInDOM(&$oDom)
 	{
 		$aNodes = $oDom->getElementsByTagName('*');
 		foreach ($aNodes as /* @var $oElement \DOMElement */ $oElement)
@@ -385,11 +387,11 @@ class HtmlUtils
 	/**
 	 * @param string $sHtml
 	 * @param bool $bDoNotReplaceExternalUrl = false
-	 * @param bool $bFindLinksInHtml = false
+	 * @param bool $bCreateHtmlLinksFromTextLinksInDOM = false
 	 *
 	 * @return string
 	 */
-	public static function ClearHtmlSimple($sHtml, $bDoNotReplaceExternalUrl = false, $bFindLinksInHtml = false)
+	public static function ClearHtmlSimple($sHtml, $bDoNotReplaceExternalUrl = false, $bCreateHtmlLinksFromTextLinksInDOM = false)
 	{
 		$bHasExternals = false;
 		$aFoundCIDs = array();
@@ -397,7 +399,7 @@ class HtmlUtils
 		$aFoundedContentLocationUrls = array();
 
 		return \MailSo\Base\HtmlUtils::ClearHtml($sHtml, $bHasExternals, $aFoundCIDs,
-			$aContentLocationUrls, $aFoundedContentLocationUrls, $bDoNotReplaceExternalUrl, $bFindLinksInHtml);
+			$aContentLocationUrls, $aFoundedContentLocationUrls, $bDoNotReplaceExternalUrl, $bCreateHtmlLinksFromTextLinksInDOM);
 	}
 
 	/**
@@ -407,14 +409,14 @@ class HtmlUtils
 	 * @param array $aContentLocationUrls = array()
 	 * @param array $aFoundedContentLocationUrls = array()
 	 * @param bool $bDoNotReplaceExternalUrl = false
-	 * @param bool $bFindLinksInHtml = false
+	 * @param bool $bCreateHtmlLinksFromTextLinksInDOM = false
 	 * @param callback|null $fAdditionalExternalFilter = null
 	 *
 	 * @return string
 	 */
 	public static function ClearHtml($sHtml, &$bHasExternals = false, &$aFoundCIDs = array(),
 		$aContentLocationUrls = array(), &$aFoundedContentLocationUrls = array(),
-		$bDoNotReplaceExternalUrl = false, $bFindLinksInHtml = false, $fAdditionalExternalFilter = null)
+		$bDoNotReplaceExternalUrl = false, $bCreateHtmlLinksFromTextLinksInDOM = false, $fAdditionalExternalFilter = null)
 	{
 		$sResult = '';
 		$sHtml = null === $sHtml ? '' : (string) $sHtml;
@@ -443,9 +445,9 @@ class HtmlUtils
 
 		if ($oDom)
 		{
-			if ($bFindLinksInHtml)
+			if ($bCreateHtmlLinksFromTextLinksInDOM)
 			{
-				\MailSo\Base\HtmlUtils::FindLinksInDOM($oDom);
+				\MailSo\Base\HtmlUtils::CreateHtmlLinksFromTextLinksInDOM($oDom);
 			}
 
 			$aNodes = $oDom->getElementsByTagName('*');
