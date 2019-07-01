@@ -52,6 +52,13 @@ class HtmlUtils
 		@$oDom->loadHTML('<'.'?xml version="1.0" encoding="utf-8"?'.'>'.
 			'<html '.$sHtmlAttrs.'><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body '.$sBodyAttrs.'>'.$sText.'</body></html>');
 
+		// Uncomment the following lines to get parsing errors in the log file.
+		// Add LIBXML_PARSEHUGE as second parametr to loadHTML method if you get "Excessive depth in document: 256 use XML_PARSE_HUGE option" error
+//		if (\MailSo\Base\Utils::FunctionExistsAndEnabled('libxml_get_errors'))
+//		{
+//			\Aurora\System\Api::Log(libxml_get_errors());
+//		}
+
 		return $oDom;
 	}
 
