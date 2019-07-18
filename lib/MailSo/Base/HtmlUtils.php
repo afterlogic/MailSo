@@ -18,6 +18,16 @@ namespace MailSo\Base;
 class HtmlUtils
 {
 	static $KOS = '@@_KOS_@@';
+	static $aContentLocationUrls = [];
+	static $fAdditionalExternalFilter = null;
+	static $bDoNotReplaceExternalUrl = false;
+	static $aFoundCIDs = [];
+	static $bHasExternals = false;
+	static $aFoundedContentLocationUrls = [];
+	static $aNodesToRemove = [];
+	static $maxNestingLevel = 0;
+	static $bCreateHtmlLinksFromTextLinksInDOM = false;
+	static $oDom = null;
 
 	/**
 	 * @access private
@@ -300,95 +310,89 @@ class HtmlUtils
 	/**
 	 * Replaces text like address@domain with <a href="mailto:address@domain">address@domain</a> in the message body.
 	 * This method performs this replacement for HTML messages. In plain-text messages, links are always converted to <a>.
-	 * @param \DOMDocument $oDom
+	 * @param \DOMElement $oElement
 	 */
-	public static function CreateHtmlLinksFromTextLinksInDOM(&$oDom)
+	public static function CreateHtmlLinksFromTextLinksInDOMElement($oElement)
 	{
-		$aNodes = $oDom->getElementsByTagName('*');
-		foreach ($aNodes as /* @var $oElement \DOMElement */ $oElement)
+		$sTagNameLower = \strtolower($oElement->tagName);
+		$sParentTagNameLower = isset($oElement->parentNode) && isset($oElement->parentNode->tagName) ?
+			\strtolower($oElement->parentNode->tagName) : '';
+
+		if (!\in_array($sTagNameLower, array('html', 'meta', 'head', 'style', 'script', 'img', 'button', 'input', 'textarea', 'a')) &&
+			'a' !== $sParentTagNameLower && $oElement->childNodes && 0 < $oElement->childNodes->length)
 		{
-			$sTagNameLower = \strtolower($oElement->tagName);
-			$sParentTagNameLower = isset($oElement->parentNode) && isset($oElement->parentNode->tagName) ?
-				\strtolower($oElement->parentNode->tagName) : '';
-
-			if (!\in_array($sTagNameLower, array('html', 'meta', 'head', 'style', 'script', 'img', 'button', 'input', 'textarea', 'a')) &&
-				'a' !== $sParentTagNameLower && $oElement->childNodes && 0 < $oElement->childNodes->length)
+			$oSubItem = null;
+			$aTextNodes = array();
+			$iIndex = $oElement->childNodes->length - 1;
+			while ($iIndex > -1)
 			{
-				$oSubItem = null;
-				$aTextNodes = array();
-				$iIndex = $oElement->childNodes->length - 1;
-				while ($iIndex > -1)
+				$oSubItem = $oElement->childNodes->item($iIndex);
+				if ($oSubItem && XML_TEXT_NODE === $oSubItem->nodeType)
 				{
-					$oSubItem = $oElement->childNodes->item($iIndex);
-					if ($oSubItem && XML_TEXT_NODE === $oSubItem->nodeType)
-					{
-						$aTextNodes[] = $oSubItem;
-					}
-
-					$iIndex--;
+					$aTextNodes[] = $oSubItem;
 				}
 
-				unset($oSubItem);
+				$iIndex--;
+			}
 
-				foreach ($aTextNodes as $oTextNode)
+			unset($oSubItem);
+
+			foreach ($aTextNodes as $oTextNode)
+			{
+				if ($oTextNode && 0 < \strlen($oTextNode->wholeText)/* && \preg_match('/http[s]?:\/\//i', $oTextNode->wholeText)*/)
 				{
-					if ($oTextNode && 0 < \strlen($oTextNode->wholeText)/* && \preg_match('/http[s]?:\/\//i', $oTextNode->wholeText)*/)
+					$sText = \MailSo\Base\LinkFinder::NewInstance()
+						->Text($oTextNode->wholeText)
+						->UseDefaultWrappers(true)
+						->CompileText()
+					;
+
+					$oSubDom = \MailSo\Base\HtmlUtils::GetDomFromText('<html><body>'.$sText.'</body></html>');
+					if ($oSubDom)
 					{
-						$sText = \MailSo\Base\LinkFinder::NewInstance()
-							->Text($oTextNode->wholeText)
-							->UseDefaultWrappers(true)
-							->CompileText()
-						;
-
-						$oSubDom = \MailSo\Base\HtmlUtils::GetDomFromText('<html><body>'.$sText.'</body></html>');
-						if ($oSubDom)
+						$oBodyNodes = $oSubDom->getElementsByTagName('body');
+						if ($oBodyNodes && 0 < $oBodyNodes->length)
 						{
-							$oBodyNodes = $oSubDom->getElementsByTagName('body');
-							if ($oBodyNodes && 0 < $oBodyNodes->length)
+							$oBodyChildNodes = $oBodyNodes->item(0)->childNodes;
+							if ($oBodyChildNodes && $oBodyChildNodes->length)
 							{
-								$oBodyChildNodes = $oBodyNodes->item(0)->childNodes;
-								if ($oBodyChildNodes && $oBodyChildNodes->length)
+								for ($iIndex = 0, $iLen = $oBodyChildNodes->length; $iIndex < $iLen; $iIndex++)
 								{
-									for ($iIndex = 0, $iLen = $oBodyChildNodes->length; $iIndex < $iLen; $iIndex++)
+									$oSubItem = $oBodyChildNodes->item($iIndex);
+									if ($oSubItem)
 									{
-										$oSubItem = $oBodyChildNodes->item($iIndex);
-										if ($oSubItem)
+										if (XML_ELEMENT_NODE === $oSubItem->nodeType &&
+											'a' === \strtolower($oSubItem->tagName))
 										{
-											if (XML_ELEMENT_NODE === $oSubItem->nodeType &&
-												'a' === \strtolower($oSubItem->tagName))
-											{
-												$oLink = $oDom->createElement('a',
-													\str_replace(':', \MailSo\Base\HtmlUtils::$KOS, \htmlspecialchars($oSubItem->nodeValue)));
+											$oLink = self::$oDom->createElement('a',
+												\str_replace(':', \MailSo\Base\HtmlUtils::$KOS, \htmlspecialchars($oSubItem->nodeValue)));
 
-												$sHref = $oSubItem->getAttribute('href');
-												if ($sHref)
-												{
-													$oLink->setAttribute('href', $sHref);
-												}
-
-												$oElement->insertBefore($oLink, $oTextNode);
-											}
-											else
+											$sHref = $oSubItem->getAttribute('href');
+											if ($sHref)
 											{
-												$oElement->insertBefore($oDom->importNode($oSubItem), $oTextNode);
+												$oLink->setAttribute('href', $sHref);
 											}
+
+											$oElement->insertBefore($oLink, $oTextNode);
+										}
+										else
+										{
+											$oElement->insertBefore(self::$oDom->importNode($oSubItem), $oTextNode);
 										}
 									}
-
-									$oElement->removeChild($oTextNode);
 								}
-							}
 
-							unset($oBodyNodes);
+								$oElement->removeChild($oTextNode);
+							}
 						}
 
-						unset($oSubDom, $sText);
+						unset($oBodyNodes);
 					}
+
+					unset($oSubDom, $sText);
 				}
 			}
 		}
-
-		unset($aNodes);
 	}
 
 	/**
@@ -425,6 +429,13 @@ class HtmlUtils
 		$aContentLocationUrls = array(), &$aFoundedContentLocationUrls = array(),
 		$bDoNotReplaceExternalUrl = false, $bCreateHtmlLinksFromTextLinksInDOM = false, $fAdditionalExternalFilter = null)
 	{
+		self::$aContentLocationUrls = $aContentLocationUrls;
+		self::$fAdditionalExternalFilter = $fAdditionalExternalFilter;
+		self::$bDoNotReplaceExternalUrl = $bDoNotReplaceExternalUrl;
+		self::$bHasExternals = $bHasExternals;
+		self::$aFoundCIDs = $aFoundCIDs;
+		self::$aFoundedContentLocationUrls  = $aFoundedContentLocationUrls;
+		self::$bCreateHtmlLinksFromTextLinksInDOM = $bCreateHtmlLinksFromTextLinksInDOM;
 		$sResult = '';
 		$sHtml = null === $sHtml ? '' : (string) $sHtml;
 		$sHtml = \trim($sHtml);
@@ -435,10 +446,10 @@ class HtmlUtils
 
 		if ($fAdditionalExternalFilter && !\is_callable($fAdditionalExternalFilter))
 		{
-			$fAdditionalExternalFilter = null;
+			self::$fAdditionalExternalFilter = null;
 		}
 
-		$bHasExternals = false;
+		self::$bHasExternals = false;
 
 		$sHtml = \MailSo\Base\HtmlUtils::ClearTags($sHtml);
 		$sHtml = \MailSo\Base\HtmlUtils::ClearOn($sHtml);
@@ -452,244 +463,14 @@ class HtmlUtils
 
 		if ($oDom)
 		{
-			if ($bCreateHtmlLinksFromTextLinksInDOM)
-			{
-				\MailSo\Base\HtmlUtils::CreateHtmlLinksFromTextLinksInDOM($oDom);
-			}
-
-			$aNodes = $oDom->getElementsByTagName('*');
-			$aNodesToRemove = [];
-			foreach ($aNodes as /* @var $oElement \DOMElement */ $oElement)
-			{
-				if (\in_array(\strtolower($oElement->tagName), array('svg', 'head', 'link',
-					'base', 'meta', 'title', 'style', 'script', 'bgsound', 'keygen', 'source',
-					'object', 'embed', 'applet', 'mocha', 'iframe', 'frame', 'frameset', 'video', 'audio')) && isset($oElement->parentNode))
-				{
-					// can't remove them in the first loop becase some of nodes won't be removed.
-					// issue can be reproduced if html message is
-					// <meta><meta><meta><meta http-equiv="refresh" content="1; url=http://attacker.com">
-					$aNodesToRemove[] = $oElement;
-				}
-			}
-			foreach ($aNodesToRemove as $oElement)
+			self::$oDom = $oDom;
+			self::$maxNestingLevel = (int) @ini_get('xdebug.max_nesting_level');
+			self::processNode($oDom, 0);
+			foreach (self::$aNodesToRemove as $oElement)
 			{
 				if (isset($oElement->parentNode))
 				{
 					@$oElement->parentNode->removeChild($oElement);
-				}
-			}
-
-			$aNodes = $oDom->getElementsByTagName('*');
-			foreach ($aNodes as /* @var $oElement \DOMElement */ $oElement)
-			{
-				$sTagNameLower = \strtolower($oElement->tagName);
-
-				// convert body attributes to styles
-				if ('body' === $sTagNameLower)
-				{
-					$aAttrs = array(
-						'text' => '',
-						'topmargin' => '',
-						'leftmargin' => '',
-						'bottommargin' => '',
-						'rightmargin' => ''
-					);
-
-					if (isset($oElement->attributes))
-					{
-						foreach ($oElement->attributes as $sAttributeName => /* @var $oAttributeNode \DOMNode */ $oAttributeNode)
-						{
-							if ($oAttributeNode && isset($oAttributeNode->nodeValue))
-							{
-								$sAttributeNameLower = \strtolower($sAttributeName);
-								if (isset($aAttrs[$sAttributeNameLower]) && '' === $aAttrs[$sAttributeNameLower])
-								{
-									$aAttrs[$sAttributeNameLower] = array($sAttributeName, \trim($oAttributeNode->nodeValue));
-								}
-							}
-						}
-					}
-
-					$aStyles = array();
-					foreach ($aAttrs as $sIndex => $aItem)
-					{
-						if (\is_array($aItem))
-						{
-							$oElement->removeAttribute($aItem[0]);
-
-							switch ($sIndex)
-							{
-								case 'text':
-									$aStyles[] = 'color: '.$aItem[1];
-									break;
-								case 'topmargin':
-									$aStyles[] = 'margin-top: '.((int) $aItem[1]).'px';
-									break;
-								case 'leftmargin':
-									$aStyles[] = 'margin-left: '.((int) $aItem[1]).'px';
-									break;
-								case 'bottommargin':
-									$aStyles[] = 'margin-bottom: '.((int) $aItem[1]).'px';
-									break;
-								case 'rightmargin':
-									$aStyles[] = 'margin-right: '.((int) $aItem[1]).'px';
-									break;
-							}
-						}
-					}
-
-					if (0 < \count($aStyles))
-					{
-						$sStyles = $oElement->hasAttribute('style') ? $oElement->getAttribute('style') : '';
-						$oElement->setAttribute('style', (empty($sStyles) ? '' : $sStyles.'; ').\implode('; ', $aStyles));
-					}
-				}
-
-				if ('iframe' === $sTagNameLower || 'frame' === $sTagNameLower)
-				{
-					$oElement->setAttribute('src', 'javascript:false');
-				}
-
-				if (\in_array($sTagNameLower, array('a', 'form', 'area')))
-				{
-					$oElement->setAttribute('target', '_blank');
-				}
-
-				if (\in_array($sTagNameLower, array('a', 'form', 'area', 'input', 'button', 'textarea')))
-				{
-					$oElement->setAttribute('tabindex', '-1');
-				}
-
-//				if ('blockquote' === $sTagNameLower)
-//				{
-//					$oElement->removeAttribute('style');
-//				}
-
-				foreach (array(
-					'id', 'class', 'contenteditable', 'designmode', 'formaction', 'data-bind', 'xmlns',
-					'srcset'
-				) as $sAttr)
-				{
-					@$oElement->removeAttribute($sAttr);
-				}
-
-				foreach (array(
-					'load', 'blur', 'error', 'focus', 'formchange', 'change', 'start',
-					'copy', 'contextmenu', 'drag', 'cut', 'paste',
-					'click', 'dblclick', 'keydown', 'keypress', 'keyup',
-					'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup',
-					'move', 'resize', 'resizeend', 'resizestart', 'scroll', 'select', 'submit', 'upload'
-				) as $sAttr)
-				{
-					@$oElement->removeAttribute('on'.$sAttr);
-				}
-
-				$aNotJsAttrs = ['href', 'action'];
-				foreach ($aNotJsAttrs as $sAttrName)
-				{
-					if ($oElement->hasAttribute($sAttrName))
-					{
-						$sHref = \trim($oElement->getAttribute($sAttrName));
-						if (substr($sHref, 0, 11) === 'javascript:')
-						{
-							$oElement->setAttribute($sAttrName, 'javascript:void(0)');
-						}
-						else if ('a' === $sTagNameLower)
-						{
-							$oElement->setAttribute('rel', 'external');
-						}
-					}
-				}
-
-				if ($oElement->hasAttribute('src'))
-				{
-					$sSrc = \trim($oElement->getAttribute('src'));
-					$oElement->removeAttribute('src');
-
-					if (\in_array($sSrc, $aContentLocationUrls))
-					{
-						$oElement->setAttribute('data-x-src-location', $sSrc);
-						$aFoundedContentLocationUrls[] = $sSrc;
-					}
-					else if ('cid:' === \strtolower(\substr($sSrc, 0, 4)))
-					{
-						$oElement->setAttribute('data-x-src-cid', \substr($sSrc, 4));
-						$aFoundCIDs[] = \substr($sSrc, 4);
-					}
-					else
-					{
-						if (\preg_match('/http[s]?:\/\//i', $sSrc))
-						{
-							if ($bDoNotReplaceExternalUrl)
-							{
-								$oElement->setAttribute('src', $sSrc);
-							}
-							else
-							{
-								$oElement->setAttribute('data-x-src', $sSrc);
-								if ($fAdditionalExternalFilter)
-								{
-									$sCallResult = \call_user_func($fAdditionalExternalFilter, $sSrc);
-									if (0 < \strlen($sCallResult))
-									{
-										$oElement->setAttribute('data-x-additional-src', $sCallResult);
-									}
-								}
-							}
-
-							$bHasExternals = true;
-						}
-						else if ('data:image/' === \strtolower(\substr(\trim($sSrc), 0, 11)))
-						{
-							$oElement->setAttribute('src', $sSrc);
-						}
-						else
-						{
-							$oElement->setAttribute('data-x-broken-src', $sSrc);
-						}
-					}
-				}
-
-				$sBackground = $oElement->hasAttribute('background')
-					? \trim($oElement->getAttribute('background')) : '';
-				$sBackgroundColor = $oElement->hasAttribute('bgcolor')
-					? \trim($oElement->getAttribute('bgcolor')) : '';
-
-				if (!empty($sBackground) || !empty($sBackgroundColor))
-				{
-					$aStyles = array();
-					$sStyles = $oElement->hasAttribute('style')
-						? $oElement->getAttribute('style') : '';
-
-					if (!empty($sBackground))
-					{
-						$aStyles[] = 'background-image: url(\''.$sBackground.'\')';
-						$oElement->removeAttribute('background');
-					}
-
-					if (!empty($sBackgroundColor))
-					{
-						$aStyles[] = 'background-color: '.$sBackgroundColor;
-						$oElement->removeAttribute('bgcolor');
-					}
-
-					$oElement->setAttribute('style', (empty($sStyles) ? '' : $sStyles.'; ').\implode('; ', $aStyles));
-				}
-
-				if ($oElement->hasAttribute('style'))
-				{
-					$oElement->setAttribute('style',
-						\MailSo\Base\HtmlUtils::ClearStyle($oElement->getAttribute('style'), $oElement, $bHasExternals,
-							$aFoundCIDs, $aContentLocationUrls, $aFoundedContentLocationUrls, $bDoNotReplaceExternalUrl, $fAdditionalExternalFilter));
-				}
-				
-				if ($oElement->hasAttribute('cursor'))
-				{
-					$sCursor = $oElement->getAttribute('style');
-					if (strpos($sCursor, 'url(') !== false)
-					{
-						$oElement->removeAttribute('cursor');
-					}
 				}
 			}
 
@@ -706,6 +487,9 @@ class HtmlUtils
 		$sResult = '<div data-x-div-type="html" '.$sHtmlAttrs.'>'.$sResult.'</div>';
 
 		$sResult = \str_replace(\MailSo\Base\HtmlUtils::$KOS, ':', $sResult);
+		$aFoundCIDs = self::$aFoundCIDs;
+		$bHasExternals = self::$bHasExternals;
+		$aFoundedContentLocationUrls = self::$aFoundedContentLocationUrls;
 
 		return \trim($sResult);
 	}
@@ -778,7 +562,7 @@ class HtmlUtils
 			{
 				$oElement->removeAttribute('data-x-additional-src');
 			}
-			
+
 			if ($oElement->hasAttribute('data-x-additional-style-url'))
 			{
 				$oElement->removeAttribute('data-x-additional-style-url');
@@ -1055,5 +839,254 @@ class HtmlUtils
 		$sText = preg_replace("/[\n]{3,}/", "\n\n", $sText);
 
 		return trim($sText);
+	}
+
+	public static function processNode($oNode, $iLevel)
+	{
+		if (self::$maxNestingLevel > 0 && $iLevel === (self::$maxNestingLevel - 1))
+		{
+			//Step out if maximum nesting level exceeded
+			return false;
+		}
+
+		if ($oNode->nodeType === XML_ELEMENT_NODE)
+		{
+			if (\in_array(\strtolower($oNode->tagName), array('svg', 'head', 'link',
+			'base', 'meta', 'title', 'style', 'script', 'bgsound', 'keygen', 'source',
+			'object', 'embed', 'applet', 'mocha', 'iframe', 'frame', 'frameset', 'video', 'audio')) && isset($oNode->parentNode))
+			{
+				self::$aNodesToRemove[] = $oNode;
+				return false;
+			}
+			else
+			{
+				if (self::$bCreateHtmlLinksFromTextLinksInDOM)
+				{
+					self::CreateHtmlLinksFromTextLinksInDOMElement($oNode);
+				}
+				self::clearNode($oNode);
+			}
+		}
+		if (!$oNode->hasChildNodes()) {
+			return false;
+		}
+		$iLevel++;
+		$oNode = $oNode->firstChild;
+		do {
+			if ($oNode->nodeType === XML_ELEMENT_NODE || $oNode->nodeType === XML_HTML_DOCUMENT_NODE)
+			{
+				self::processNode($oNode, $iLevel);
+			}
+		}
+		while($oNode = $oNode->nextSibling);
+	}
+
+	public static function clearNode($oElement)
+	{
+
+		$sTagNameLower = \strtolower($oElement->tagName);
+
+		// convert body attributes to styles
+		if ('body' === $sTagNameLower)
+		{
+			$aAttrs = array(
+				'text' => '',
+				'topmargin' => '',
+				'leftmargin' => '',
+				'bottommargin' => '',
+				'rightmargin' => ''
+			);
+
+			if (isset($oElement->attributes))
+			{
+				foreach ($oElement->attributes as $sAttributeName => /* @var $oAttributeNode \DOMNode */ $oAttributeNode)
+				{
+					if ($oAttributeNode && isset($oAttributeNode->nodeValue))
+					{
+						$sAttributeNameLower = \strtolower($sAttributeName);
+						if (isset($aAttrs[$sAttributeNameLower]) && '' === $aAttrs[$sAttributeNameLower])
+						{
+							$aAttrs[$sAttributeNameLower] = array($sAttributeName, \trim($oAttributeNode->nodeValue));
+						}
+					}
+				}
+			}
+
+			$aStyles = array();
+			foreach ($aAttrs as $sIndex => $aItem)
+			{
+				if (\is_array($aItem))
+				{
+					$oElement->removeAttribute($aItem[0]);
+
+					switch ($sIndex)
+					{
+						case 'text':
+							$aStyles[] = 'color: '.$aItem[1];
+							break;
+						case 'topmargin':
+							$aStyles[] = 'margin-top: '.((int) $aItem[1]).'px';
+							break;
+						case 'leftmargin':
+							$aStyles[] = 'margin-left: '.((int) $aItem[1]).'px';
+							break;
+						case 'bottommargin':
+							$aStyles[] = 'margin-bottom: '.((int) $aItem[1]).'px';
+							break;
+						case 'rightmargin':
+							$aStyles[] = 'margin-right: '.((int) $aItem[1]).'px';
+							break;
+					}
+				}
+			}
+
+			if (0 < \count($aStyles))
+			{
+				$sStyles = $oElement->hasAttribute('style') ? $oElement->getAttribute('style') : '';
+				$oElement->setAttribute('style', (empty($sStyles) ? '' : $sStyles.'; ').\implode('; ', $aStyles));
+			}
+		}
+
+		if ('iframe' === $sTagNameLower || 'frame' === $sTagNameLower)
+		{
+			$oElement->setAttribute('src', 'javascript:false');
+		}
+
+		if (\in_array($sTagNameLower, array('a', 'form', 'area')))
+		{
+			$oElement->setAttribute('target', '_blank');
+		}
+
+		if (\in_array($sTagNameLower, array('a', 'form', 'area', 'input', 'button', 'textarea')))
+		{
+			$oElement->setAttribute('tabindex', '-1');
+		}
+
+		foreach (array(
+			'id', 'class', 'contenteditable', 'designmode', 'formaction', 'data-bind', 'xmlns',
+			'srcset'
+		) as $sAttr)
+		{
+			@$oElement->removeAttribute($sAttr);
+		}
+
+		foreach (array(
+			'load', 'blur', 'error', 'focus', 'formchange', 'change', 'start',
+			'copy', 'contextmenu', 'drag', 'cut', 'paste',
+			'click', 'dblclick', 'keydown', 'keypress', 'keyup',
+			'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup',
+			'move', 'resize', 'resizeend', 'resizestart', 'scroll', 'select', 'submit', 'upload'
+		) as $sAttr)
+		{
+			@$oElement->removeAttribute('on'.$sAttr);
+		}
+
+		$aNotJsAttrs = ['href', 'action'];
+		foreach ($aNotJsAttrs as $sAttrName)
+		{
+			if ($oElement->hasAttribute($sAttrName))
+			{
+				$sHref = \trim($oElement->getAttribute($sAttrName));
+				if (substr($sHref, 0, 11) === 'javascript:')
+				{
+					$oElement->setAttribute($sAttrName, 'javascript:void(0)');
+				}
+				else if ('a' === $sTagNameLower)
+				{
+					$oElement->setAttribute('rel', 'external');
+				}
+			}
+		}
+
+		if ($oElement->hasAttribute('src'))
+		{
+			$sSrc = \trim($oElement->getAttribute('src'));
+			$oElement->removeAttribute('src');
+
+			if (\in_array($sSrc, self::$aContentLocationUrls))
+			{
+				$oElement->setAttribute('data-x-src-location', $sSrc);
+				self::$aFoundedContentLocationUrls[] = $sSrc;
+			}
+			else if ('cid:' === \strtolower(\substr($sSrc, 0, 4)))
+			{
+				$oElement->setAttribute('data-x-src-cid', \substr($sSrc, 4));
+				self::$aFoundCIDs[] = \substr($sSrc, 4);
+			}
+			else
+			{
+				if (\preg_match('/http[s]?:\/\//i', $sSrc))
+				{
+					if (self::$bDoNotReplaceExternalUrl)
+					{
+						$oElement->setAttribute('src', $sSrc);
+					}
+					else
+					{
+						$oElement->setAttribute('data-x-src', $sSrc);
+						if (self::$fAdditionalExternalFilter)
+						{
+							$sCallResult = \call_user_func(self::$fAdditionalExternalFilter, $sSrc);
+							if (0 < \strlen($sCallResult))
+							{
+								$oElement->setAttribute('data-x-additional-src', $sCallResult);
+							}
+						}
+					}
+
+					self::$bHasExternals = true;
+				}
+				else if ('data:image/' === \strtolower(\substr(\trim($sSrc), 0, 11)))
+				{
+					$oElement->setAttribute('src', $sSrc);
+				}
+				else
+				{
+					$oElement->setAttribute('data-x-broken-src', $sSrc);
+				}
+			}
+		}
+
+		$sBackground = $oElement->hasAttribute('background')
+			? \trim($oElement->getAttribute('background')) : '';
+		$sBackgroundColor = $oElement->hasAttribute('bgcolor')
+			? \trim($oElement->getAttribute('bgcolor')) : '';
+
+		if (!empty($sBackground) || !empty($sBackgroundColor))
+		{
+			$aStyles = array();
+			$sStyles = $oElement->hasAttribute('style')
+				? $oElement->getAttribute('style') : '';
+
+			if (!empty($sBackground))
+			{
+				$aStyles[] = 'background-image: url(\''.$sBackground.'\')';
+				$oElement->removeAttribute('background');
+			}
+
+			if (!empty($sBackgroundColor))
+			{
+				$aStyles[] = 'background-color: '.$sBackgroundColor;
+				$oElement->removeAttribute('bgcolor');
+			}
+
+			$oElement->setAttribute('style', (empty($sStyles) ? '' : $sStyles.'; ').\implode('; ', $aStyles));
+		}
+
+		if ($oElement->hasAttribute('style'))
+		{
+			$oElement->setAttribute('style',
+				\MailSo\Base\HtmlUtils::ClearStyle($oElement->getAttribute('style'), $oElement, self::$bHasExternals,
+					self::$aFoundCIDs, self::$aContentLocationUrls, self::$aFoundedContentLocationUrls, self::$bDoNotReplaceExternalUrl, self::$fAdditionalExternalFilter));
+		}
+
+		if ($oElement->hasAttribute('cursor'))
+		{
+			$sCursor = $oElement->getAttribute('style');
+			if (strpos($sCursor, 'url(') !== false)
+			{
+				$oElement->removeAttribute('cursor');
+			}
+		}
 	}
 }
