@@ -1730,7 +1730,7 @@ END;
 	 *
 	 * @return bool
 	 */
-	public static function FpassthruWithTimeLimitReset($fResource, $iBufferLen = 8192)
+	public static function FpassthruWithTimeLimitReset($fResource, $iBufferLen = 8192, $fCallback = null)
 	{
 		$bResult = false;
 		if (\is_resource($fResource))
@@ -1740,7 +1740,14 @@ END;
 				$sBuffer = @\fread($fResource, $iBufferLen);
 				if (false !== $sBuffer)
 				{
-					echo $sBuffer;
+					if (is_callable($fCallback))
+					{
+						echo $fCallback($sBuffer);
+					}
+					else
+					{
+						echo $sBuffer;
+					}
 					\MailSo\Base\Utils::ResetTimeLimit();
 					continue;
 				}
