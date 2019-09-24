@@ -1025,6 +1025,7 @@ class ImapClient extends \MailSo\Net\NetClient
 						$aReturn[2] = (int) $oImapResponse->ResponseList[3][4];
 						$aReturn[3] = (int) $oImapResponse->ResponseList[3][5];
 					}
+					break;
 				}
 			}
 		}
