@@ -43,6 +43,11 @@ class Logger extends \MailSo\Base\Collection
 	private $bHideErrorNotices;
 
 	/**
+	 * @var bool
+	 */
+	public $bLogStackTrace = false;
+
+	/**
 	 * @access protected
 	 */
 	protected function __construct()
@@ -316,7 +321,9 @@ class Logger extends \MailSo\Base\Collection
 
 			$oException->__LOGINNED__ = true;
 
-			return $this->Write((string) $oException, $iType, $sName, $bSearchSecretWords);
+			$sException = $this->bLogStackTrace ? (string) $oException : $oException->getMessage();
+
+			return $this->Write($sException, $iType, $sName, $bSearchSecretWords);
 		}
 
 		return false;
