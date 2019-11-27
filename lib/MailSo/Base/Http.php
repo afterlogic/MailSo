@@ -275,6 +275,12 @@ class Http
 		$sServerKey = 'HTTP_'.\strtoupper(\str_replace('-', '_', $sHeader));
 		$sResultHeader = $this->GetServer($sServerKey, '');
 
+		if (0 === \strlen($sResultHeader))
+		{
+			$sServerKey = 'REDIRECT_' . $sServerKey;
+			$sResultHeader = $this->GetServer($sServerKey, '');
+		}
+
 		if (0 === \strlen($sResultHeader) &&
 			\MailSo\Base\Utils::FunctionExistsAndEnabled('apache_request_headers'))
 		{
