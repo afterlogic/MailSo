@@ -51,6 +51,10 @@ class DateTimeHelper
 	{
 		$sDateTime = \trim(\preg_replace('/ \([a-zA-Z0-9]+\)$/', '', \trim($sDateTime)));
 		$oDateTime = \DateTime::createFromFormat('D, d M Y H:i:s O', $sDateTime, \MailSo\Base\DateTimeHelper::GetUtcTimeZoneObject());
+		if (!$oDateTime)
+		{
+			$oDateTime = \DateTime::createFromFormat('d M Y H:i:s O', $sDateTime, \MailSo\Base\DateTimeHelper::GetUtcTimeZoneObject());
+		}
 		return $oDateTime ? $oDateTime->getTimestamp() : 0;
 	}
 
