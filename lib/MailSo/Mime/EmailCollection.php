@@ -155,16 +155,16 @@ class EmailCollection extends \MailSo\Base\Collection
 
 		while ($iCurrentPos < $sWorkingRecipientsLen)
 		{
-			switch ($sWorkingRecipients{$iCurrentPos})
+			switch ($sWorkingRecipients[$iCurrentPos])
 			{
 				case '\'':
 				case '"':
 					if (!$bIsInQuotes)
 					{
-						$sChQuote = $sWorkingRecipients{$iCurrentPos};
+						$sChQuote = $sWorkingRecipients[$iCurrentPos];
 						$bIsInQuotes = true;
 					}
-					else if ($sChQuote == $sWorkingRecipients{$iCurrentPos})
+					else if ($sChQuote == $sWorkingRecipients[$iCurrentPos])
 					{
 						$bIsInQuotes = false;
 					}
@@ -213,7 +213,7 @@ class EmailCollection extends \MailSo\Base\Collection
 							$this->Add(
 								\MailSo\Mime\Email::Parse(\substr($sWorkingRecipients, $iEmailStartPos, $iEmailEndPos - $iEmailStartPos))
 							);
-							
+
 							$iEmailStartPos = $iCurrentPos + 1;
 						}
 						catch (\MailSo\Base\Exceptions\InvalidArgumentException $oException)

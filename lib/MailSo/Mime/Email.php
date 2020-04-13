@@ -94,7 +94,7 @@ class Email
 
 		while ($iCurrentIndex < \strlen($sEmailAddress))
 		{
-			switch ($sEmailAddress{$iCurrentIndex})
+			switch ($sEmailAddress[$iCurrentIndex])
 			{
 //				case '\'':
 				case '"':
