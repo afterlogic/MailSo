@@ -994,6 +994,7 @@ class HtmlUtils
 				else if ('a' === $sTagNameLower)
 				{
 					$oElement->setAttribute('rel', 'external');
+					$oElement->setAttribute('class', 'external');
 				}
 			}
 		}

@@ -143,11 +143,11 @@ class LinkFinder
 				$sLink = 'http://'.\ltrim($sLink);
 			}
 
-			return '<a '.($bAddTargetBlank ? 'target="_blank" ': '').'href="'.$sLink.'">'.$sNameLink.'</a>';
+			return '<a '.($bAddTargetBlank ? 'target="_blank" ': '').'href="'.$sLink.'" class="external">'.$sNameLink.'</a>';
 		};
 
 		$this->fMailWrapper = function ($sEmail) use ($bAddTargetBlank) {
-			return '<a '.($bAddTargetBlank ? 'target="_blank" ': '').'href="mailto:'.$sEmail.'">'.$sEmail.'</a>';
+			return '<a '.($bAddTargetBlank ? 'target="_blank" ': '').'href="mailto:'.$sEmail.'" class="external">'.$sEmail.'</a>';
 		};
 
 		return $this;
