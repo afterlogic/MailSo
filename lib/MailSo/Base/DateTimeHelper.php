@@ -74,8 +74,7 @@ class DateTimeHelper
 			return \MailSo\Base\DateTimeHelper::ParseRFC2822DateString($sDateTime);
 		}
 
-		$oDateTime = \DateTime::createFromFormat('d-M-Y H:i:s O', $sDateTime, \MailSo\Base\DateTimeHelper::GetUtcTimeZoneObject());
-		return $oDateTime ? $oDateTime->getTimestamp() : 0;
+		return self::ParseDateStringType1($sDateTime);
 	}
 
 	/**
@@ -87,7 +86,11 @@ class DateTimeHelper
 	 */
 	public static function ParseDateStringType1($sDateTime)
 	{
-		$oDateTime = \DateTime::createFromFormat('Y-m-d H:i:s O', \trim($sDateTime), \MailSo\Base\DateTimeHelper::GetUtcTimeZoneObject());
+		$oDateTime = \DateTime::createFromFormat('d-M-Y H:i:s O', $sDateTime, \MailSo\Base\DateTimeHelper::GetUtcTimeZoneObject());
+		if (!$oDateTime)
+		{
+			$oDateTime = \DateTime::createFromFormat('d-M-Y H:i:s O T', $sDateTime, \MailSo\Base\DateTimeHelper::GetUtcTimeZoneObject());
+		}
 		return $oDateTime ? $oDateTime->getTimestamp() : 0;
 	}
 }
