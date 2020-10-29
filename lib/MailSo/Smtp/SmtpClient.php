@@ -129,7 +129,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 		{
 			$sEhloHost = empty($_SERVER['HTTP_HOST']) ? '' : \trim($_SERVER['HTTP_HOST']);
 		}
-		
+
 		if (empty($sEhloHost))
 		{
 			$sEhloHost = \function_exists('gethostname') ? \gethostname() : 'localhost';
@@ -184,7 +184,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 	public function Login($sLogin, $sPassword)
 	{
 		$sLogin = \MailSo\Base\Utils::IdnToAscii($sLogin);
-		
+
 		if ($this->IsAuthSupported('LOGIN'))
 		{
 			try
@@ -313,7 +313,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 	{
 		$sFrom = \MailSo\Base\Utils::IdnToAscii($sFrom, true);
 		$sCmd = 'FROM:<'.$sFrom.'>';
-		
+
 		$sSizeIfSupported = (string) $sSizeIfSupported;
 		if (0 < \strlen($sSizeIfSupported) && \is_numeric($sSizeIfSupported) && $this->IsSupported('SIZE'))
 		{
@@ -419,29 +419,16 @@ class SmtpClient extends \MailSo\Net\NetClient
 
 		$this->bRunningCallback = true;
 
-		while (!\feof($rDataStream))
+		while (strlen($sData = \fread($rDataStream, 65536)) > 0)
 		{
-			$sBuffer = \fgets($rDataStream);
-			if (false !== $sBuffer)
+			$sLineToEnd = \fgets($rDataStream);
+			if ($sLineToEnd)
 			{
-				if (0 === \strpos($sBuffer, '.'))
-				{
-					$sBuffer = '.'.$sBuffer;
-				}
-
-				$this->sendRaw(\rtrim($sBuffer, "\r\n"), false);
-
-				\MailSo\Base\Utils::ResetTimeLimit();
-				continue;
+				$sData .= $sLineToEnd;
 			}
-			else if (!\feof($rDataStream))
-			{
-				$this->writeLogException(
-					new Exceptions\RuntimeException('Cannot read input resource'),
-					\MailSo\Log\Enumerations\Type::ERROR, true);
-			}
+			$this->sendData($sData, false);
 
-			break;
+			\MailSo\Base\Utils::ResetTimeLimit();
 		}
 
 		$this->sendRequestWithCheck('.', 250);
@@ -538,7 +525,7 @@ class SmtpClient extends \MailSo\Net\NetClient
 		{
 			$this->sendRequestWithCheck('STARTTLS', 220);
 			$this->EnableCrypto();
-			
+
 			$this->ehloOrHelo($sEhloHost);
 		}
 		else if (\MailSo\Net\Enumerations\ConnectionSecurityType::STARTTLS === $this->iSecurityType)
@@ -549,6 +536,50 @@ class SmtpClient extends \MailSo\Net\NetClient
 		}
 
 		$this->bHelo = true;
+	}
+
+	protected function quoteData(&$sData)
+    {
+        $sData = preg_replace('/^\./m', '..', $sData);
+	}
+
+	protected function sendData($sRaw, $bWriteToLog = true, $sFakeRaw = '')
+	{
+		if ($this->bUnreadBuffer)
+		{
+			$this->writeLogException(
+				new Exceptions\SocketUnreadBufferException(),
+				\MailSo\Log\Enumerations\Type::ERROR, true);
+		}
+
+		$bFake = 0 < \strlen($sFakeRaw);
+
+		if ($this->oLogger && $this->oLogger->IsShowSecter())
+		{
+			$bFake = false;
+		}
+
+		$this->quoteData($sRaw);
+
+		$mResult = @\fwrite($this->rConnect, $sRaw);
+		if (false === $mResult)
+		{
+			$this->IsConnected(true);
+
+			$this->writeLogException(
+				new Exceptions\SocketWriteException(),
+				\MailSo\Log\Enumerations\Type::ERROR, true);
+		}
+		else
+		{
+			\MailSo\Base\Loader::IncStatistic('NetWrite', $mResult);
+
+			if ($bWriteToLog)
+			{
+				$this->writeLogWithCrlf('> '.($bFake ? $sFakeRaw : $sRaw), //.' ['.$iWriteSize.']',
+					$bFake ? \MailSo\Log\Enumerations\Type::SECURE : \MailSo\Log\Enumerations\Type::INFO);
+			}
+		}
 	}
 
 	/**
