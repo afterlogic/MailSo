@@ -766,8 +766,6 @@ class HtmlUtils
 				'/<th[^>]*>(.+?)<\/th>/i',
 				'/&nbsp;/i',
 				'/&quot;/i',
-				'/&gt;/i',
-				'/&lt;/i',
 				'/&amp;/i',
 				'/&copy;/i',
 				'/&trade;/i',
@@ -810,8 +808,6 @@ class HtmlUtils
 				"\t\\1\n",
 				' ',
 				'"',
-				'>',
-				'<',
 				'&',
 				'(c)',
 				'(tm)',
@@ -835,9 +831,18 @@ class HtmlUtils
 
 		$sText = str_ireplace('<div>',"\n<div>", $sText);
 		$sText = strip_tags($sText, '');
+		
+		// angle brackets must be replaced after the strip_tags function call to prevent replacing some text after < symbol
+		$sText = preg_replace(array(
+				'/&gt;/i',
+				'/&lt;/i',
+			), array(
+				'>',
+				'<',
+			), $sText);
+		
 		$sText = preg_replace("/\n\\s+\n/", "\n", $sText);
 		$sText = preg_replace("/[\n]{3,}/", "\n\n", $sText);
-
 		return trim($sText);
 	}
 
