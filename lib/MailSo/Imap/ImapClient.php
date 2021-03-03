@@ -297,6 +297,16 @@ class ImapClient extends \MailSo\Net\NetClient
 		return $this;
 	}
 
+	public static function GetXOAuthKeyStatic($sEmail, $sAccessToken)
+	{
+		if ($sEmail == null || empty($sEmail) || $sAccessToken == null || empty($sAccessToken))
+		{
+			throw new \MailSo\Base\Exceptions\InvalidArgumentException();
+		}
+
+		return \base64_encode('user='.$sEmail."\1".'auth=Bearer '.$sAccessToken."\1\1");
+	}
+
 	/**
 	 * @param string $sXOAuth2Token
 	 *
