@@ -73,7 +73,7 @@ class SubStreams
 		$sHashName = \md5(\microtime(true).\rand(1000, 9999));
 
 		self::$aStreams[$sHashName] = $aSubStreams;
-		
+
 		\MailSo\Base\Loader::IncStatistic('CreateStream/SubStreams');
 
 		return \fopen(self::STREAM_NAME.'://'.$sHashName, 'rb');
@@ -89,7 +89,7 @@ class SubStreams
 		{
 			return $this->aSubStreams[$this->iIndex];
 		}
-		
+
 		return $nNull;
 	}
 
@@ -111,7 +111,7 @@ class SubStreams
 		{
 			$sHashName = $aPath['host'];
 			$this->sHash = $sHashName;
-			
+
 			if (isset(self::$aStreams[$sHashName]) &&
 				\is_array(self::$aStreams[$sHashName]) &&
 				0 < \count(self::$aStreams[$sHashName]))
@@ -138,7 +138,7 @@ class SubStreams
 	{
 		$sReturn = '';
 		$mCurrentPart = null;
-		
+
 		if ($iCount > 0)
 		{
 			if ($iCount < \strlen($this->sBuffer))
@@ -170,7 +170,7 @@ class SubStreams
 							{
 								return false;
 							}
-							
+
 							$sReturn .= $sReadResult;
 
 							$iLen = \strlen($sReturn);
@@ -192,8 +192,21 @@ class SubStreams
 					}
 					else if (\is_string($mCurrentPart))
 					{
-						$sReturn .= $mCurrentPart;
-						$this->iIndex++;
+						if (\strlen($mCurrentPart) > $iCount)
+						{
+							/** $mCurrentPart will not fit in the remaining
+							 * $iCount bytes of $sReturn. Break out of the
+							 * loop without copying it: we will be called
+							 * again with a larger $iCount that it should
+							 * fit into.
+							 */
+							break;
+						}
+						else
+						{
+							$sReturn .= $mCurrentPart;
+							$this->iIndex++;
+						}
 					}
 				}
 			}
@@ -258,7 +271,7 @@ class SubStreams
 	{
 		return false;
 	}
-	
+
 	static public function setGlobalCounter($value)
     {
 		$GLOBALS['counter'] = $value;
@@ -271,11 +284,11 @@ class SubStreams
 			self::setGlobalCounter($defValue);
 		}
 		return $GLOBALS['counter'];
-    }	
-	
+    }
+
 	static public function incGlobalCounter()
     {
 		self::setGlobalCounter(self::getGlobalCounter() + 1);
     }
-	
+
 }
