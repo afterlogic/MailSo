@@ -138,7 +138,7 @@ class SubStreams
 	{
 		$sReturn = '';
 		$mCurrentPart = null;
-
+		
 		if ($iCount > 0)
 		{
 			if ($iCount < \strlen($this->sBuffer))
@@ -170,20 +170,8 @@ class SubStreams
 							{
 								return false;
 							}
-
+							
 							$sReturn .= $sReadResult;
-
-							$iLen = \strlen($sReturn);
-							if ($iCount < $iLen)
-							{
-								$this->sBuffer = \substr($sReturn, $iCount);
-								$sReturn = \substr($sReturn, 0, $iCount);
-								$iCount = 0;
-							}
-							else
-							{
-								$iCount -= $iLen;
-							}
 						}
 						else
 						{
@@ -192,21 +180,20 @@ class SubStreams
 					}
 					else if (\is_string($mCurrentPart))
 					{
-						if (\strlen($mCurrentPart) > $iCount)
-						{
-							/** $mCurrentPart will not fit in the remaining
-							 * $iCount bytes of $sReturn. Break out of the
-							 * loop without copying it: we will be called
-							 * again with a larger $iCount that it should
-							 * fit into.
-							 */
-							break;
-						}
-						else
-						{
-							$sReturn .= $mCurrentPart;
-							$this->iIndex++;
-						}
+						$sReturn .= $mCurrentPart;
+						$this->iIndex++;
+					}
+					
+					$iLen = \strlen($sReturn);
+					if ($iCount < $iLen)
+					{
+						$this->sBuffer = \substr($sReturn, $iCount);
+						$sReturn = \substr($sReturn, 0, $iCount);
+						$iCount = 0;
+					}
+					else
+					{
+						$iCount -= $iLen;
 					}
 				}
 			}
