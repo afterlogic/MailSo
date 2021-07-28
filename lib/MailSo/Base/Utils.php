@@ -2351,7 +2351,7 @@ END;
 	/**
 	 * @return \Net_IDNA2
 	 */
-	private static function idn()
+	public static function idn()
 	{
 		static $oIdn = null;
 		if (null === $oIdn)
