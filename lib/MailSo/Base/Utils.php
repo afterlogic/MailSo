@@ -2331,11 +2331,6 @@ END;
 	 * @return bool
 	 */
 	public static function ValidateDomain($domain) {
-		// Check for starting and ending hyphen(s)
-		if(preg_match('/-./', $domain) || substr($domain, 1) == '-') {
-			return false;
-		}
-	
 		// Detect and convert international UTF-8 domain names to IDNA ASCII form
 		try {
 			if(mb_detect_encoding($domain) != "ASCII") {
