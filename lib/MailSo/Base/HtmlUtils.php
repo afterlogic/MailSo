@@ -216,7 +216,7 @@ class HtmlUtils
 			{
 				// skip
 			}
-			else */if (\in_array($sName, array('behavior', 'pointer-events')) ||
+			else */if (\in_array($sName, array('behavior')) ||
 				('cursor' === $sName && !\in_array(\strtolower($sValue), array('none', 'cursor'))) ||
 				('display' === $sName && 'none' === \strtolower($sValue)) ||
 				\preg_match('/expression/i', $sValue) ||
