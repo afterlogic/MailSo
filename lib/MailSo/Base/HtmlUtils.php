@@ -219,6 +219,7 @@ class HtmlUtils
 			else */if (\in_array($sName, array('behavior')) ||
 				('cursor' === $sName && !\in_array(\strtolower($sValue), array('none', 'cursor'))) ||
 				('display' === $sName && 'none' === \strtolower($sValue)) ||
+				('position' === $sName && 'absolute' === \strtolower($sValue)) ||
 				\preg_match('/expression/i', $sValue) ||
 				('text-indent' === $sName && '-' === \substr(trim($sValue), 0, 1))
 			)
