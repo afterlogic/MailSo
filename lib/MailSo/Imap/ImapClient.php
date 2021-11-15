@@ -881,7 +881,7 @@ class ImapClient extends \MailSo\Net\NetClient
 			}
 		}
 
-		if (!\MailSo\Base\Validator::NotEmptyString($sFolderName, true))
+		if (!\MailSo\Base\Validator::NotEmptyString((string) $sFolderName, true))
 		{
 			throw new \MailSo\Base\Exceptions\InvalidArgumentException();
 		}
