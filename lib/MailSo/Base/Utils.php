@@ -2359,14 +2359,14 @@ END;
 	}
 
 	/**
-	 * @return \Net_IDNA2
+	 * @return Idn
 	 */
 	public static function idn()
 	{
 		static $oIdn = null;
 		if (null === $oIdn)
 		{
-			$oIdn = new \Net_IDNA2();
+			$oIdn = new Idn();
 		}
 
 		return $oIdn;
@@ -2384,7 +2384,26 @@ END;
 		{
 			try
 			{
-				$sStr = self::idn()->decode($sStr);
+				$sStr = $bLowerIfAscii ? \MailSo\Base\Utils::StrToLowerIfAscii($sStr) : $sStr;
+
+				$sUser = '';
+				$sDomain = $sStr;
+				if (false !== \strpos($sStr, '@'))
+				{
+					$sUser = \MailSo\Base\Utils::GetAccountNameFromEmail($sStr);
+					$sDomain = \MailSo\Base\Utils::GetDomainFromEmail($sStr);
+				}
+		
+				if (0 < \strlen($sDomain))
+				{
+					try
+					{
+						$sDomain = self::idn()->decode($sDomain);
+					}
+					catch (\Exception $oException) {}
+				}
+		
+				$sStr = ('' === $sUser ? '' : $sUser.'@').$sDomain;
 			}
 			catch (\Exception $oException) {}
 		}
