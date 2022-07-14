@@ -1481,7 +1481,11 @@ END;
 					{
 						if ($iNow - \filemtime($sTempPath.'/'.$sFile) > $iTime2Kill)
 						{
-							@\unlink($sTempPath.'/'.$sFile);
+							if (@\is_dir($sTempPath.'/'.$sFile)) {
+								self::RecRmDir($sTempPath.'/'.$sFile);
+							} else {
+								@\unlink($sTempPath.'/'.$sFile);
+							}
 						}
 						else
 						{
