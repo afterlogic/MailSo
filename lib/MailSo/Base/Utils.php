@@ -562,7 +562,7 @@ END;
 	public static function DecodeHeaderValue($sEncodedValue, $sIncomingCharset = '', $sForcedIncomingCharset = '')
 	{
 		$sValue = $sEncodedValue;
-		if (0 < \strlen($sIncomingCharset))
+		if ($sIncomingCharset !== null && 0 < \strlen($sIncomingCharset))
 		{
 			$sIncomingCharset = \MailSo\Base\Utils::NormalizeCharsetByValue($sIncomingCharset, $sValue);
 
@@ -1535,6 +1535,10 @@ END;
 	 */
 	public static function Utf8Clear($sUtfString, $sReplaceOn = '')
 	{
+		if ($sUtfString === null) 
+		{
+			$sUtfString = '';
+		}
 		if ('' === $sUtfString)
 		{
 			return $sUtfString;
