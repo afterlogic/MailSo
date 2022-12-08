@@ -235,6 +235,12 @@ class Logger extends \MailSo\Base\Collection
 					$this->Write('Time delta: '.$aStatistic['time'], \MailSo\Log\Enumerations\Type::TIME_DELTA);
 				}
 			}
+
+			$err = error_get_last();
+			if (!is_null($err) && $err['type'] === E_ERROR) {
+				$this->Write($err['file'].' [line:'.$err['line'].', code:'.$err['type'].']', \MailSo\Log\Enumerations\Type::ERROR_PHP, 'PHP');
+				$this->Write('Error: '.$err['message'], \MailSo\Log\Enumerations\Type::ERROR_PHP, 'PHP');
+			}
 		}
 	}
 
