@@ -18,9 +18,9 @@ namespace MailSo\Imap\Enumerations;
  */
 class FolderStatus
 {
-	const MESSAGES = 'MESSAGES';
-	const RECENT = 'RECENT';
-	const UNSEEN = 'UNSEEN';
-	const UIDNEXT = 'UIDNEXT';
-	const UIDVALIDITY = 'UIDVALIDITY';
+    public const MESSAGES = 'MESSAGES';
+    public const RECENT = 'RECENT';
+    public const UNSEEN = 'UNSEEN';
+    public const UIDNEXT = 'UIDNEXT';
+    public const UIDVALIDITY = 'UIDVALIDITY';
 }

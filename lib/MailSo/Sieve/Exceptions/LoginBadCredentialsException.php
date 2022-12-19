@@ -16,4 +16,6 @@ namespace MailSo\Sieve\Exceptions;
  * @package Sieve
  * @subpackage Exceptions
  */
-class LoginBadCredentialsException extends \MailSo\Sieve\Exceptions\LoginException {}
+class LoginBadCredentialsException extends \MailSo\Sieve\Exceptions\LoginException
+{
+}

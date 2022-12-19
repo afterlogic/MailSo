@@ -18,17 +18,17 @@ namespace MailSo\Base\Exceptions;
  */
 class Exception extends \Exception
 {
-	/**
-	 * @param string $sMessage
-	 * @param int $iCode
-	 * @param \Exception|null $oPrevious
-	 */
-	public function __construct($sMessage = '', $iCode = 0, $oPrevious = null)
-	{
-		$sMessage = 0 === strlen($sMessage) ? str_replace('\\', '-', get_class($this))
-//			.' ('. basename($this->getFile()).' ~ '.$this->getLine().')' 
-				: $sMessage;
+    /**
+     * @param string $sMessage
+     * @param int $iCode
+     * @param \Exception|null $oPrevious
+     */
+    public function __construct($sMessage = '', $iCode = 0, $oPrevious = null)
+    {
+        $sMessage = 0 === strlen($sMessage) ? str_replace('\\', '-', get_class($this))
+//			.' ('. basename($this->getFile()).' ~ '.$this->getLine().')'
+                : $sMessage;
 
-		parent::__construct($sMessage, $iCode, $oPrevious);
-	}
+        parent::__construct($sMessage, $iCode, $oPrevious);
+    }
 }

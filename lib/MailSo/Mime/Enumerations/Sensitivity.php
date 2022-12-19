@@ -18,8 +18,8 @@ namespace MailSo\Mime\Enumerations;
  */
 class Sensitivity
 {
-	const NOTHING = 0;
-	const CONFIDENTIAL = 1;
-	const PRIVATE_ = 2;
-	const PERSONAL = 3;
+    public const NOTHING = 0;
+    public const CONFIDENTIAL = 1;
+    public const PRIVATE_ = 2;
+    public const PERSONAL = 3;
 }

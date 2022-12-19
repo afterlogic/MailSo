@@ -2300,29 +2300,39 @@ END;
 	 * @param string $sAdditionalSalt = ''
 	 *
      * @return string
+     * @return string
+     */
+    public static function Md5Rand($sAdditionalSalt = '')
+    {
+        return \md5(\microtime(true).\rand(10000, 99999).
+            \md5($sAdditionalSalt).\rand(10000, 99999).\microtime(true));
+    }
+
+    /**
+     * @param string $sAdditionalSalt = ''
+     *
+     * @return string
      */
     public static function Sha1Rand($sAdditionalSalt = '')
     {
-		return \sha1(\microtime(true).\rand(10000, 99999).
-			\sha1($sAdditionalSalt).\rand(10000, 99999).\microtime(true));
-	}
+        return \sha1(\microtime(true).\rand(10000, 99999).
+            \sha1($sAdditionalSalt).\rand(10000, 99999).\microtime(true));
+    }
 
-	/**
+    /**
      * @param string $sData
      * @param string $sKey
-	 *
+     *
      * @return string
      */
     public static function Hmac($sData, $sKey)
     {
-        if (\function_exists('hash_hmac'))
-		{
+        if (\function_exists('hash_hmac')) {
             return \hash_hmac('md5', $sData, $sKey);
         }
 
         $iLen = 64;
-        if ($iLen < \strlen($sKey))
-		{
+        if ($iLen < \strlen($sKey)) {
             $sKey = \pack('H*', \md5($sKey));
         }
 
@@ -2333,152 +2343,142 @@ END;
         return \md5(($sKey ^ $sOpad).\pack('H*', \md5(($sKey ^ $sIpad).$sData)));
     }
 
-	/**
-	 * @param string $domain
-	 *
-	 * @return bool
-	 */
-	public static function ValidateDomain($domain) {
-		// Detect and convert international UTF-8 domain names to IDNA ASCII form
-		try {
-			if(mb_detect_encoding($domain) != "ASCII") {
-				$idn_dom = \MailSo\Base\Utils::idn()->encode($domain);
-			} else {
-				$idn_dom = $domain;
-			}
-		} catch (\Exception $oEx) {
-			return false;
-		}
-		// Validate
-		if(filter_var($idn_dom, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) != false) {
-			return true;
-		}
-		return false;
-	}
+    /**
+     * @param string $domain
+     *
+     * @return bool
+     */
+    public static function ValidateDomain($domain)
+    {
+        // Detect and convert international UTF-8 domain names to IDNA ASCII form
+        try {
+            if (mb_detect_encoding($domain) != "ASCII") {
+                $idn_dom = \MailSo\Base\Utils::idn()->encode($domain);
+            } else {
+                $idn_dom = $domain;
+            }
+        } catch (\Exception $oEx) {
+            return false;
+        }
+        // Validate
+        if (filter_var($idn_dom, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) != false) {
+            return true;
+        }
+        return false;
+    }
 
-	/**
-	 * @param string $sIp
-	 *
-	 * @return bool
-	 */
-	public static function ValidateIP($sIp)
-	{
-		return !empty($sIp) && $sIp === @\filter_var($sIp, FILTER_VALIDATE_IP);
-	}
+    /**
+     * @param string $sIp
+     *
+     * @return bool
+     */
+    public static function ValidateIP($sIp)
+    {
+        return !empty($sIp) && $sIp === @\filter_var($sIp, FILTER_VALIDATE_IP);
+    }
 
-	/**
-	 * @return Idn
-	 */
-	public static function idn()
-	{
-		static $oIdn = null;
-		if (null === $oIdn)
-		{
-			$oIdn = new Idn();
-		}
+    /**
+     * @return Idn
+     */
+    public static function idn()
+    {
+        static $oIdn = null;
+        if (null === $oIdn) {
+            $oIdn = new Idn();
+        }
 
-		return $oIdn;
-	}
+        return $oIdn;
+    }
 
-	/**
-	 * @param string $sStr
-	 * @param bool $bLowerIfAscii = false
-	 *
-	 * @return string
-	 */
-	public static function IdnToUtf8($sStr, $bLowerIfAscii = false)
-	{
-		if (0 < \strlen($sStr) && \preg_match('/(^|\.)xn--/i', $sStr))
-		{
-			try
-			{
-				$sStr = $bLowerIfAscii ? \MailSo\Base\Utils::StrToLowerIfAscii($sStr) : $sStr;
+    /**
+     * @param string $sStr
+     * @param bool $bLowerIfAscii = false
+     *
+     * @return string
+     */
+    public static function IdnToUtf8($sStr, $bLowerIfAscii = false)
+    {
+        if (0 < \strlen($sStr) && \preg_match('/(^|\.)xn--/i', $sStr)) {
+            try {
+                $sStr = $bLowerIfAscii ? \MailSo\Base\Utils::StrToLowerIfAscii($sStr) : $sStr;
 
-				$sUser = '';
-				$sDomain = $sStr;
-				if (false !== \strpos($sStr, '@'))
-				{
-					$sUser = \MailSo\Base\Utils::GetAccountNameFromEmail($sStr);
-					$sDomain = \MailSo\Base\Utils::GetDomainFromEmail($sStr);
-				}
-		
-				if (0 < \strlen($sDomain))
-				{
-					try
-					{
-						$sDomain = self::idn()->decode($sDomain);
-					}
-					catch (\Exception $oException) {}
-				}
-		
-				$sStr = ('' === $sUser ? '' : $sUser.'@').$sDomain;
-			}
-			catch (\Exception $oException) {}
-		}
+                $sUser = '';
+                $sDomain = $sStr;
+                if (false !== \strpos($sStr, '@')) {
+                    $sUser = \MailSo\Base\Utils::GetAccountNameFromEmail($sStr);
+                    $sDomain = \MailSo\Base\Utils::GetDomainFromEmail($sStr);
+                }
 
-		return $bLowerIfAscii ? \MailSo\Base\Utils::StrToLowerIfAscii($sStr) : $sStr;
-	}
-	
-	/**
-	 * @param string $sText
-	 * @param string $sChar
-	 *
-	 * @return string
-	 */
-	public static function CustomTrim($sText, $sChar = null)
-	{
-		while (strlen($sText) > 1 && ($sChar ? substr($sText, 0, 1) === $sChar : true) && (substr($sText, 0, 1) === substr($sText, -1)))
-		{
-			$sText = substr($sText, 1);
-			$sText = substr($sText, 0, strlen($sText) - 1);
-		}
-		return $sText;
-	}	
+                if (0 < \strlen($sDomain)) {
+                    try {
+                        $sDomain = self::idn()->decode($sDomain);
+                    } catch (\Exception $oException) {
+                    }
+                }
 
-	/**
-	 * @param string $sStr
-	 * @param bool $bLowerIfAscii = false
-	 *
-	 * @return string
-	 */
-	public static function IdnToAscii($sStr, $bLowerIfAscii = false)
-	{
-		$sStr = $bLowerIfAscii ? \MailSo\Base\Utils::StrToLowerIfAscii($sStr) : $sStr;
+                $sStr = ('' === $sUser ? '' : $sUser.'@').$sDomain;
+            } catch (\Exception $oException) {
+            }
+        }
 
-		$sUser = '';
-		$sDomain = $sStr;
-		if (false !== \strpos($sStr, '@'))
-		{
-			$sUser = \MailSo\Base\Utils::GetAccountNameFromEmail($sStr);
-			$sDomain = \MailSo\Base\Utils::GetDomainFromEmail($sStr);
-		}
+        return $bLowerIfAscii ? \MailSo\Base\Utils::StrToLowerIfAscii($sStr) : $sStr;
+    }
 
-		if (0 < \strlen($sDomain) && \preg_match('/[^\x20-\x7E]/', $sDomain))
-		{
-			try
-			{
-				$sDomain = self::idn()->encode($sDomain);
-			}
-			catch (\Exception $oException) {}
-		}
+    /**
+     * @param string $sText
+     * @param string $sChar
+     *
+     * @return string
+     */
+    public static function CustomTrim($sText, $sChar = null)
+    {
+        while (strlen($sText) > 1 && ($sChar ? substr($sText, 0, 1) === $sChar : true) && (substr($sText, 0, 1) === substr($sText, -1))) {
+            $sText = substr($sText, 1);
+            $sText = substr($sText, 0, strlen($sText) - 1);
+        }
+        return $sText;
+    }
 
-		return ('' === $sUser ? '' : $sUser.'@').$sDomain;
-	}
+    /**
+     * @param string $sStr
+     * @param bool $bLowerIfAscii = false
+     *
+     * @return string
+     */
+    public static function IdnToAscii($sStr, $bLowerIfAscii = false)
+    {
+        $sStr = $bLowerIfAscii ? \MailSo\Base\Utils::StrToLowerIfAscii($sStr) : $sStr;
 
-	/**
-	 * @param string $sPassword
-	 *
-	 * @return bool
-	 */
-	public static function PasswordWeaknessCheck($sPassword)
-	{
-		$sPassword = \trim($sPassword);
-		if (6 > \strlen($sPassword))
-		{
-			return false;
-		}
+        $sUser = '';
+        $sDomain = $sStr;
+        if (false !== \strpos($sStr, '@')) {
+            $sUser = \MailSo\Base\Utils::GetAccountNameFromEmail($sStr);
+            $sDomain = \MailSo\Base\Utils::GetDomainFromEmail($sStr);
+        }
 
-		$sLine = 'password 123.456 12345678 abc123 qwerty monkey letmein dragon 111.111 baseball iloveyou trustno1 1234567 sunshine master 123.123 welcome shadow ashley football jesus michael ninja mustang password1 123456 123456789 qwerty 111111 1234567 666666 12345678 7777777 123321 654321 1234567890 123123 555555 vkontakte gfhjkm 159753 777777 temppassword qazwsx 1q2w3e 1234 112233 121212 qwertyuiop qq18ww899 987654321 12345 zxcvbn zxcvbnm 999999 samsung ghbdtn 1q2w3e4r 1111111 123654 159357 131313 qazwsxedc 123qwe 222222 asdfgh 333333 9379992 asdfghjkl 4815162342 12344321 88888888 11111111 knopka 789456 qwertyu 1q2w3e4r5t iloveyou vfhbyf marina password qweasdzxc 10203 987654 yfnfif cjkysirj nikita 888888 vfrcbv k.,jdm qwertyuiop[] qwe123 qweasd natasha 123123123 fylhtq q1w2e3 stalker 1111111111 q1w2e3r4 nastya 147258369 147258 fyfcnfcbz 1234554321 1qaz2wsx andrey 111222 147852 genius sergey 7654321 232323 123789 fktrcfylh spartak admin test 123 azerty abc123 lol123 easytocrack1 hello saravn holysh!t test123 tundra_cool2 456 dragon thomas killer root 1111 pass master aaaaaa a monkey daniel asdasd e10adc3949ba59abbe56e057f20f883e changeme computer jessica letmein mirage loulou lol superman shadow admin123 secret administrator sophie kikugalanetroot doudou liverpool hallo sunshine charlie parola 100827092 michael andrew password1 fuckyou matrix cjmasterinf internet hallo123 eminem demo gewinner pokemon abcd1234 guest ngockhoa martin sandra asdf hejsan george qweqwe lollipop lovers q1q1q1 tecktonik naruto 12 password12 password123 password1234 password12345 password123456 password1234567 password12345678 password123456789 000000 maximius 123abc baseball1 football1 soccer princess slipknot 11111 nokia super star 666999 12341234 1234321 135790 159951 212121 zzzzzz 121314 134679 142536 19921992 753951 7007 1111114 124578 19951995 258456 qwaszx zaqwsx 55555 77777 54321 qwert 22222 33333 99999 88888 66666';
-		return false === \strpos($sLine, \strtolower($sPassword));
-	}
+        if (0 < \strlen($sDomain) && \preg_match('/[^\x20-\x7E]/', $sDomain)) {
+            try {
+                $sDomain = self::idn()->encode($sDomain);
+            } catch (\Exception $oException) {
+            }
+        }
+
+        return ('' === $sUser ? '' : $sUser.'@').$sDomain;
+    }
+
+    /**
+     * @param string $sPassword
+     *
+     * @return bool
+     */
+    public static function PasswordWeaknessCheck($sPassword)
+    {
+        $sPassword = \trim($sPassword);
+        if (6 > \strlen($sPassword)) {
+            return false;
+        }
+
+        $sLine = 'password 123.456 12345678 abc123 qwerty monkey letmein dragon 111.111 baseball iloveyou trustno1 1234567 sunshine master 123.123 welcome shadow ashley football jesus michael ninja mustang password1 123456 123456789 qwerty 111111 1234567 666666 12345678 7777777 123321 654321 1234567890 123123 555555 vkontakte gfhjkm 159753 777777 temppassword qazwsx 1q2w3e 1234 112233 121212 qwertyuiop qq18ww899 987654321 12345 zxcvbn zxcvbnm 999999 samsung ghbdtn 1q2w3e4r 1111111 123654 159357 131313 qazwsxedc 123qwe 222222 asdfgh 333333 9379992 asdfghjkl 4815162342 12344321 88888888 11111111 knopka 789456 qwertyu 1q2w3e4r5t iloveyou vfhbyf marina password qweasdzxc 10203 987654 yfnfif cjkysirj nikita 888888 vfrcbv k.,jdm qwertyuiop[] qwe123 qweasd natasha 123123123 fylhtq q1w2e3 stalker 1111111111 q1w2e3r4 nastya 147258369 147258 fyfcnfcbz 1234554321 1qaz2wsx andrey 111222 147852 genius sergey 7654321 232323 123789 fktrcfylh spartak admin test 123 azerty abc123 lol123 easytocrack1 hello saravn holysh!t test123 tundra_cool2 456 dragon thomas killer root 1111 pass master aaaaaa a monkey daniel asdasd e10adc3949ba59abbe56e057f20f883e changeme computer jessica letmein mirage loulou lol superman shadow admin123 secret administrator sophie kikugalanetroot doudou liverpool hallo sunshine charlie parola 100827092 michael andrew password1 fuckyou matrix cjmasterinf internet hallo123 eminem demo gewinner pokemon abcd1234 guest ngockhoa martin sandra asdf hejsan george qweqwe lollipop lovers q1q1q1 tecktonik naruto 12 password12 password123 password1234 password12345 password123456 password1234567 password12345678 password123456789 000000 maximius 123abc baseball1 football1 soccer princess slipknot 11111 nokia super star 666999 12341234 1234321 135790 159951 212121 zzzzzz 121314 134679 142536 19921992 753951 7007 1111114 124578 19951995 258456 qwaszx zaqwsx 55555 77777 54321 qwert 22222 33333 99999 88888 66666';
+        return false === \strpos($sLine, \strtolower($sPassword));
+    }
 }

@@ -7,8 +7,8 @@
 
 namespace MailSo\Base;
 
-class Idn {
-
+class Idn
+{
     public function encode($url)
     {
         return idn_to_ascii($url);

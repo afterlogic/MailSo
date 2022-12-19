@@ -18,13 +18,13 @@ namespace MailSo\Imap\Enumerations;
  */
 class FolderType
 {
-	const USER = 0;
-	const INBOX = 1;
-	const SENT = 2;
-	const DRAFTS = 3;
-	const JUNK = 4;
-	const TRASH = 5;
-	const IMPORTANT = 10;
-	const FLAGGED = 11;
-	const ALL = 12;
+    public const USER = 0;
+    public const INBOX = 1;
+    public const SENT = 2;
+    public const DRAFTS = 3;
+    public const JUNK = 4;
+    public const TRASH = 5;
+    public const IMPORTANT = 10;
+    public const FLAGGED = 11;
+    public const ALL = 12;
 }

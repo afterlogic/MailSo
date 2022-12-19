@@ -18,7 +18,7 @@ namespace MailSo\Mime\Enumerations;
  */
 class MessagePriority
 {
-	const LOW = 5;
-	const NORMAL = 3;
-	const HIGH = 1;
+    public const LOW = 5;
+    public const NORMAL = 3;
+    public const HIGH = 1;
 }

@@ -16,4 +16,6 @@ namespace MailSo\Net\Exceptions;
  * @package Net
  * @subpackage Exceptions
  */
-class InvalidArgumentException extends \MailSo\Net\Exceptions\Exception {}
+class InvalidArgumentException extends \MailSo\Net\Exceptions\Exception
+{
+}

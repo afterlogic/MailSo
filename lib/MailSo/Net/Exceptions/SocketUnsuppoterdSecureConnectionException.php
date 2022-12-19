@@ -16,4 +16,6 @@ namespace MailSo\Net\Exceptions;
  * @package Net
  * @subpackage Exceptions
  */
-class SocketUnsuppoterdSecureConnectionException extends \MailSo\Net\Exceptions\ConnectionException {}
+class SocketUnsuppoterdSecureConnectionException extends \MailSo\Net\Exceptions\ConnectionException
+{
+}

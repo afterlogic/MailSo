@@ -18,17 +18,17 @@ namespace MailSo\Imap\Enumerations;
  */
 class StoreAction
 {
-	const SET_FLAGS = 'FLAGS';
-	const SET_FLAGS_SILENT = 'FLAGS.SILENT';
-	const ADD_FLAGS = '+FLAGS';
-	const ADD_FLAGS_SILENT = '+FLAGS.SILENT';
-	const REMOVE_FLAGS = '-FLAGS';
-	const REMOVE_FLAGS_SILENT = '-FLAGS.SILENT';
-	
-	const SET_GMAIL_LABELS = 'X-GM-LABELS';
-	const SET_GMAIL_LABELS_SILENT = 'X-GM-LABELS.SILENT';
-	const ADD_GMAIL_LABELS = '+X-GM-LABELS';
-	const ADD_GMAIL_LABELS_SILENT = '+X-GM-LABELS.SILENT';
-	const REMOVE_GMAIL_LABELS = '-X-GM-LABELS';
-	const REMOVE_GMAIL_LABELS_SILENT = '-X-GM-LABELS.SILENT';
+    public const SET_FLAGS = 'FLAGS';
+    public const SET_FLAGS_SILENT = 'FLAGS.SILENT';
+    public const ADD_FLAGS = '+FLAGS';
+    public const ADD_FLAGS_SILENT = '+FLAGS.SILENT';
+    public const REMOVE_FLAGS = '-FLAGS';
+    public const REMOVE_FLAGS_SILENT = '-FLAGS.SILENT';
+
+    public const SET_GMAIL_LABELS = 'X-GM-LABELS';
+    public const SET_GMAIL_LABELS_SILENT = 'X-GM-LABELS.SILENT';
+    public const ADD_GMAIL_LABELS = '+X-GM-LABELS';
+    public const ADD_GMAIL_LABELS_SILENT = '+X-GM-LABELS.SILENT';
+    public const REMOVE_GMAIL_LABELS = '-X-GM-LABELS';
+    public const REMOVE_GMAIL_LABELS_SILENT = '-X-GM-LABELS.SILENT';
 }

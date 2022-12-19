@@ -18,8 +18,8 @@ namespace MailSo\Imap\Enumerations;
  */
 class ResponseType
 {
-	const UNKNOWN = 0;
-	const TAGGED = 1;
-	const UNTAGGED = 2;
-	const CONTINUATION = 3;
+    public const UNKNOWN = 0;
+    public const TAGGED = 1;
+    public const UNTAGGED = 2;
+    public const CONTINUATION = 3;
 }

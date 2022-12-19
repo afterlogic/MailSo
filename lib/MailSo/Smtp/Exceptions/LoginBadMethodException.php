@@ -16,4 +16,6 @@ namespace MailSo\Smtp\Exceptions;
  * @package Smtp
  * @subpackage Exceptions
  */
-class LoginBadMethodException extends \MailSo\Smtp\Exceptions\LoginException {}
+class LoginBadMethodException extends \MailSo\Smtp\Exceptions\LoginException
+{
+}

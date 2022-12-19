@@ -16,4 +16,6 @@ namespace MailSo\Pop3\Exceptions;
  * @package Pop3
  * @subpackage Exceptions
  */
-class NegativeResponseException extends \MailSo\Pop3\Exceptions\ResponseException {}
+class NegativeResponseException extends \MailSo\Pop3\Exceptions\ResponseException
+{
+}

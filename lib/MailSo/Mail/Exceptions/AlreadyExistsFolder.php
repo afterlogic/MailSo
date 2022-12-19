@@ -16,4 +16,6 @@ namespace MailSo\Mail\Exceptions;
  * @package Mail
  * @subpackage Exceptions
  */
-class AlreadyExistsFolder extends \MailSo\Mail\Exceptions\RuntimeException {}
+class AlreadyExistsFolder extends \MailSo\Mail\Exceptions\RuntimeException
+{
+}

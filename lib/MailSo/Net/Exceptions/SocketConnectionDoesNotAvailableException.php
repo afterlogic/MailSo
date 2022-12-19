@@ -16,4 +16,6 @@ namespace MailSo\Net\Exceptions;
  * @package Net
  * @subpackage Exceptions
  */
-class SocketConnectionDoesNotAvailableException extends \MailSo\Net\Exceptions\ConnectionException {}
+class SocketConnectionDoesNotAvailableException extends \MailSo\Net\Exceptions\ConnectionException
+{
+}

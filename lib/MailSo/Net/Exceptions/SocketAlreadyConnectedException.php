@@ -16,4 +16,6 @@ namespace MailSo\Net\Exceptions;
  * @package Net
  * @subpackage Exceptions
  */
-class SocketAlreadyConnectedException extends \MailSo\Net\Exceptions\ConnectionException {}
+class SocketAlreadyConnectedException extends \MailSo\Net\Exceptions\ConnectionException
+{
+}

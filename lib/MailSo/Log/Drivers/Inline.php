@@ -18,77 +18,72 @@ namespace MailSo\Log\Drivers;
  */
 class Inline extends \MailSo\Log\Driver
 {
-	/**
-	 * @var string
-	 */
-	private $sNewLine;
+    /**
+     * @var string
+     */
+    private $sNewLine;
 
-	/**
-	 * @var bool
-	 */
-	private $bHtmlEncodeSpecialChars;
+    /**
+     * @var bool
+     */
+    private $bHtmlEncodeSpecialChars;
 
-	/**
-	 * @access protected
-	 *
-	 * @param string $sNewLine = "\r\n"
-	 * @param bool $bHtmlEncodeSpecialChars = false
-	 */
-	protected function __construct($sNewLine = "\r\n", $bHtmlEncodeSpecialChars = false)
-	{
-		parent::__construct();
+    /**
+     * @access protected
+     *
+     * @param string $sNewLine = "\r\n"
+     * @param bool $bHtmlEncodeSpecialChars = false
+     */
+    protected function __construct($sNewLine = "\r\n", $bHtmlEncodeSpecialChars = false)
+    {
+        parent::__construct();
 
-		$this->sNewLine = $sNewLine;
-		$this->bHtmlEncodeSpecialChars = $bHtmlEncodeSpecialChars;
-	}
+        $this->sNewLine = $sNewLine;
+        $this->bHtmlEncodeSpecialChars = $bHtmlEncodeSpecialChars;
+    }
 
-	/**
-	 * @param string $sNewLine = "\r\n"
-	 * @param bool $bHtmlEncodeSpecialChars = false
-	 *
-	 * @return \MailSo\Log\Drivers\Inline
-	 */
-	public static function NewInstance($sNewLine = "\r\n", $bHtmlEncodeSpecialChars = false)
-	{
-		return new self($sNewLine, $bHtmlEncodeSpecialChars);
-	}
+    /**
+     * @param string $sNewLine = "\r\n"
+     * @param bool $bHtmlEncodeSpecialChars = false
+     *
+     * @return \MailSo\Log\Drivers\Inline
+     */
+    public static function NewInstance($sNewLine = "\r\n", $bHtmlEncodeSpecialChars = false)
+    {
+        return new self($sNewLine, $bHtmlEncodeSpecialChars);
+    }
 
-	/**
-	 * @param string $mDesc
-	 *
-	 * @return bool
-	 */
-	protected function writeImplementation($mDesc)
-	{
-		if (\is_array($mDesc))
-		{
-			if ($this->bHtmlEncodeSpecialChars)
-			{
-				$mDesc = \array_map(function ($sItem) {
-					return \htmlspecialchars($sItem);
-				}, $mDesc);
-			}
+    /**
+     * @param string $mDesc
+     *
+     * @return bool
+     */
+    protected function writeImplementation($mDesc)
+    {
+        if (\is_array($mDesc)) {
+            if ($this->bHtmlEncodeSpecialChars) {
+                $mDesc = \array_map(function ($sItem) {
+                    return \htmlspecialchars($sItem);
+                }, $mDesc);
+            }
 
-			$mDesc = \implode($this->sNewLine, $mDesc);
-		}
-		else
-		{
-			echo ($this->bHtmlEncodeSpecialChars) ? \htmlspecialchars($mDesc).$this->sNewLine : $mDesc.$this->sNewLine;
-		}
+            $mDesc = \implode($this->sNewLine, $mDesc);
+        } else {
+            echo ($this->bHtmlEncodeSpecialChars) ? \htmlspecialchars($mDesc).$this->sNewLine : $mDesc.$this->sNewLine;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * @return bool
-	 */
-	protected function clearImplementation()
-	{
-		if (\defined('PHP_SAPI') && 'cli' === PHP_SAPI && \MailSo\Base\Utils::FunctionExistsAndEnabled('system'))
-		{
-			\system('clear');
-		}
+    /**
+     * @return bool
+     */
+    protected function clearImplementation()
+    {
+        if (\defined('PHP_SAPI') && 'cli' === PHP_SAPI && \MailSo\Base\Utils::FunctionExistsAndEnabled('system')) {
+            \system('clear');
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

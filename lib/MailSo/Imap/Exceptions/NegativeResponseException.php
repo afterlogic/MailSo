@@ -16,4 +16,6 @@ namespace MailSo\Imap\Exceptions;
  * @package Imap
  * @subpackage Exceptions
  */
-class NegativeResponseException extends \MailSo\Imap\Exceptions\ResponseException {}
+class NegativeResponseException extends \MailSo\Imap\Exceptions\ResponseException
+{
+}

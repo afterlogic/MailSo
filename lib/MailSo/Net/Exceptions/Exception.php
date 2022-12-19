@@ -16,4 +16,6 @@ namespace MailSo\Net\Exceptions;
  * @package Net
  * @subpackage Exceptions
  */
-class Exception extends \MailSo\Base\Exceptions\Exception {}
+class Exception extends \MailSo\Base\Exceptions\Exception
+{
+}

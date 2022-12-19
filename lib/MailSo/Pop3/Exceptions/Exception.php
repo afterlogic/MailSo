@@ -16,4 +16,6 @@ namespace MailSo\Pop3\Exceptions;
  * @package Pop3
  * @subpackage Exceptions
  */
-class Exception extends \MailSo\Base\Exceptions\Exception {}
+class Exception extends \MailSo\Base\Exceptions\Exception
+{
+}

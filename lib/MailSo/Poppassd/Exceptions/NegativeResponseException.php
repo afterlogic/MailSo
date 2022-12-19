@@ -16,4 +16,6 @@ namespace MailSo\Poppassd\Exceptions;
  * @package Poppassd
  * @subpackage Exceptions
  */
-class NegativeResponseException extends \MailSo\Poppassd\Exceptions\ResponseException {}
+class NegativeResponseException extends \MailSo\Poppassd\Exceptions\ResponseException
+{
+}

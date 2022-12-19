@@ -17,125 +17,121 @@ namespace MailSo\Mime;
  */
 class Parameter
 {
-	/**
-	 * @var string
-	 */
-	private $sName;
+    /**
+     * @var string
+     */
+    private $sName;
 
-	/**
-	 * @var string
-	 */
-	private $sValue;
+    /**
+     * @var string
+     */
+    private $sValue;
 
-	/**
-	 * @access private
-	 *
-	 * @param string $sName
-	 * @param string $sValue
-	 */
-	private function __construct($sName, $sValue)
-	{
-		$this->sName = $sName;
-		$this->sValue = $sValue;
-	}
+    /**
+     * @access private
+     *
+     * @param string $sName
+     * @param string $sValue
+     */
+    private function __construct($sName, $sValue)
+    {
+        $this->sName = $sName;
+        $this->sValue = $sValue;
+    }
 
-	/**
-	 * @param string $sName
-	 * @param string $sValue = ''
-	 *
-	 * @return \MailSo\Mime\Parameter
-	 */
-	public static function NewInstance($sName, $sValue = '')
-	{
-		return new self($sName, $sValue);
-	}
+    /**
+     * @param string $sName
+     * @param string $sValue = ''
+     *
+     * @return \MailSo\Mime\Parameter
+     */
+    public static function NewInstance($sName, $sValue = '')
+    {
+        return new self($sName, $sValue);
+    }
 
-	/**
-	 * @param string $sName
-	 * @param string $sValue = ''
-	 *
-	 * @return \MailSo\Mime\Parameter
-	 */
-	public static function CreateFromParameterLine($sRawParam)
-	{
-		$oParameter = self::NewInstance('');
-		return $oParameter->Parse($sRawParam);
-	}
+    /**
+     * @param string $sName
+     * @param string $sValue = ''
+     *
+     * @return \MailSo\Mime\Parameter
+     */
+    public static function CreateFromParameterLine($sRawParam)
+    {
+        $oParameter = self::NewInstance('');
+        return $oParameter->Parse($sRawParam);
+    }
 
-	/**
-	 * @return \MailSo\Mime\Parameter
-	 */
-	public function reset()
-	{
-		$this->sName = '';
-		$this->sValue = '';
+    /**
+     * @return \MailSo\Mime\Parameter
+     */
+    public function reset()
+    {
+        $this->sName = '';
+        $this->sValue = '';
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function Name()
-	{
-		return $this->sName;
-	}
+    /**
+     * @return string
+     */
+    public function Name()
+    {
+        return $this->sName;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function Value()
-	{
-		return $this->sValue;
-	}
+    /**
+     * @return string
+     */
+    public function Value()
+    {
+        return $this->sValue;
+    }
 
-	/**
-	 * @param string $sRawParam
-	 * @param string $sSeparator = '='
-	 *
-	 * @return \MailSo\Mime\Parameter
-	 */
-	public function Parse($sRawParam, $sSeparator = '=')
-	{
-		$this->reset();
+    /**
+     * @param string $sRawParam
+     * @param string $sSeparator = '='
+     *
+     * @return \MailSo\Mime\Parameter
+     */
+    public function Parse($sRawParam, $sSeparator = '=')
+    {
+        $this->reset();
 
-		$aParts = explode($sSeparator, $sRawParam, 2);
+        $aParts = explode($sSeparator, $sRawParam, 2);
 
-		$this->sName = trim(trim($aParts[0]), '"\'');
-		if (2 === count($aParts))
-		{
-			$this->sValue = trim(trim($aParts[1]), '"\'');
-		}
+        $this->sName = trim(trim($aParts[0]), '"\'');
+        if (2 === count($aParts)) {
+            $this->sValue = trim(trim($aParts[1]), '"\'');
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param bool $bConvertSpecialsName = false
-	 *
-	 * @return string
-	 */
-	public function ToString($bConvertSpecialsName = false)
-	{
-		$sResult = '';
-		if (0 < strlen($this->sName))
-		{
-			$sResult = $this->sName.'=';
-			if ($bConvertSpecialsName && in_array(strtolower($this->sName), array(
-				strtolower(\MailSo\Mime\Enumerations\Parameter::NAME),
-				strtolower(\MailSo\Mime\Enumerations\Parameter::FILENAME)
-			)))
-			{
-				$sResult .= '"'.\MailSo\Base\Utils::EncodeUnencodedValue(
-					\MailSo\Base\Enumerations\Encoding::BASE64_SHORT,
-					$this->sValue).'"';
-			}
-			else
-			{
-				$sResult .= '"'.$this->sValue.'"';
-			}
-		}
+    /**
+     * @param bool $bConvertSpecialsName = false
+     *
+     * @return string
+     */
+    public function ToString($bConvertSpecialsName = false)
+    {
+        $sResult = '';
+        if (0 < strlen($this->sName)) {
+            $sResult = $this->sName.'=';
+            if ($bConvertSpecialsName && in_array(strtolower($this->sName), array(
+                strtolower(\MailSo\Mime\Enumerations\Parameter::NAME),
+                strtolower(\MailSo\Mime\Enumerations\Parameter::FILENAME)
+            ))) {
+                $sResult .= '"'.\MailSo\Base\Utils::EncodeUnencodedValue(
+                    \MailSo\Base\Enumerations\Encoding::BASE64_SHORT,
+                    $this->sValue
+                ).'"';
+            } else {
+                $sResult .= '"'.$this->sValue.'"';
+            }
+        }
 
-		return $sResult;
-	}
+        return $sResult;
+    }
 }

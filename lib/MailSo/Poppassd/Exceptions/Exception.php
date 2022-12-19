@@ -16,4 +16,6 @@ namespace MailSo\Poppassd\Exceptions;
  * @package Poppassd
  * @subpackage Exceptions
  */
-class Exception extends \MailSo\Base\Exceptions\Exception {}
+class Exception extends \MailSo\Base\Exceptions\Exception
+{
+}

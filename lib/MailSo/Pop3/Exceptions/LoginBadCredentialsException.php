@@ -16,4 +16,6 @@ namespace MailSo\Pop3\Exceptions;
  * @package Pop3
  * @subpackage Exceptions
  */
-class LoginBadCredentialsException extends \MailSo\Pop3\Exceptions\NegativeResponseException {}
+class LoginBadCredentialsException extends \MailSo\Pop3\Exceptions\NegativeResponseException
+{
+}

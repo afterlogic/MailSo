@@ -18,9 +18,9 @@ namespace MailSo\Imap\Enumerations;
  */
 class ResponseStatus
 {
-	const OK = 'OK';
-	const NO = 'NO';
-	const BAD = 'BAD';
-	const BYE = 'BYE';
-	const PREAUTH = 'PREAUTH';
+    public const OK = 'OK';
+    public const NO = 'NO';
+    public const BAD = 'BAD';
+    public const BYE = 'BYE';
+    public const PREAUTH = 'PREAUTH';
 }

@@ -16,4 +16,6 @@ namespace MailSo\Smtp\Exceptions;
  * @package Smtp
  * @subpackage Exceptions
  */
-class Exception extends \MailSo\Base\Exceptions\Exception {}
+class Exception extends \MailSo\Base\Exceptions\Exception
+{
+}

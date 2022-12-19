@@ -16,4 +16,6 @@ namespace MailSo\Smtp\Exceptions;
  * @package Smtp
  * @subpackage Exceptions
  */
-class NegativeResponseException extends \MailSo\Smtp\Exceptions\ResponseException {}
+class NegativeResponseException extends \MailSo\Smtp\Exceptions\ResponseException
+{
+}

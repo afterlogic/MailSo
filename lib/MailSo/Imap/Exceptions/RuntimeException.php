@@ -16,4 +16,6 @@ namespace MailSo\Imap\Exceptions;
  * @package Imap
  * @subpackage Exceptions
  */
-class RuntimeException extends \MailSo\Imap\Exceptions\Exception {}
+class RuntimeException extends \MailSo\Imap\Exceptions\Exception
+{
+}

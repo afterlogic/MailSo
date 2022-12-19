@@ -17,148 +17,144 @@ namespace MailSo\Cache;
  */
 class CacheClient
 {
-	/**
-	 * @var \MailSo\Cache\DriverInterface
-	 */
-	private $oDriver;
+    /**
+     * @var \MailSo\Cache\DriverInterface
+     */
+    private $oDriver;
 
-	/**
-	 * @var string
-	 */
-	private $sCacheIndex;
+    /**
+     * @var string
+     */
+    private $sCacheIndex;
 
-	/**
-	 * @access private
-	 */
-	private function __construct()
-	{
-		$this->oDriver = null;
-		$this->sCacheIndex = '';
-	}
+    /**
+     * @access private
+     */
+    private function __construct()
+    {
+        $this->oDriver = null;
+        $this->sCacheIndex = '';
+    }
 
-	/**
-	 * @return \MailSo\Cache\CacheClient
-	 */
-	public static function NewInstance()
-	{
-		return new self();
-	}
+    /**
+     * @return \MailSo\Cache\CacheClient
+     */
+    public static function NewInstance()
+    {
+        return new self();
+    }
 
-	/**
-	 * @param string $sKey
-	 * @param string $sValue
-	 *
-	 * @return bool
-	 */
-	public function Set($sKey, $sValue)
-	{
-		return $this->oDriver ? $this->oDriver->Set($sKey.$this->sCacheIndex, $sValue) : false;
-	}
-	
-	/**
-	 * @param string $sKey
-	 *
-	 * @return bool
-	 */
-	public function SetTimer($sKey)
-	{
-		return $this->Set($sKey.'/TIMER', time());
-	}
+    /**
+     * @param string $sKey
+     * @param string $sValue
+     *
+     * @return bool
+     */
+    public function Set($sKey, $sValue)
+    {
+        return $this->oDriver ? $this->oDriver->Set($sKey.$this->sCacheIndex, $sValue) : false;
+    }
 
-	/**
-	 * @param string $sKey
-	 * @param string $bClearAfterGet = false
-	 *
-	 * @return string
-	 */
-	public function get($sKey, $bClearAfterGet = false)
-	{
-		$sValue = '';
+    /**
+     * @param string $sKey
+     *
+     * @return bool
+     */
+    public function SetTimer($sKey)
+    {
+        return $this->Set($sKey.'/TIMER', time());
+    }
 
-		if ($this->oDriver)
-		{
-			$sValue = $this->oDriver->get($sKey.$this->sCacheIndex);
-		}
+    /**
+     * @param string $sKey
+     * @param string $bClearAfterGet = false
+     *
+     * @return string
+     */
+    public function get($sKey, $bClearAfterGet = false)
+    {
+        $sValue = '';
 
-		if ($bClearAfterGet)
-		{
-			$this->Delete($sKey);
-		}
+        if ($this->oDriver) {
+            $sValue = $this->oDriver->get($sKey.$this->sCacheIndex);
+        }
 
-		return $sValue;
-	}
+        if ($bClearAfterGet) {
+            $this->Delete($sKey);
+        }
 
-	/**
-	 * @param string $sKey
-	 *
-	 * @return int
-	 */
-	public function GetTimer($sKey)
-	{
-		$iTimer = 0;
-		$sValue = $this->get($sKey.'/TIMER');
-		if (0 < strlen($sValue) && is_numeric($sValue))
-		{
-			$iTimer = (int) $sValue;
-		}
+        return $sValue;
+    }
 
-		return $iTimer;
-	}
+    /**
+     * @param string $sKey
+     *
+     * @return int
+     */
+    public function GetTimer($sKey)
+    {
+        $iTimer = 0;
+        $sValue = $this->get($sKey.'/TIMER');
+        if (0 < strlen($sValue) && is_numeric($sValue)) {
+            $iTimer = (int) $sValue;
+        }
 
-	/**
-	 * @param string $sKey
-	 *
-	 * @return \MailSo\Cache\CacheClient
-	 */
-	public function Delete($sKey)
-	{
-		if ($this->oDriver)
-		{
-			$this->oDriver->Delete($sKey.$this->sCacheIndex);
-		}
+        return $iTimer;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $sKey
+     *
+     * @return \MailSo\Cache\CacheClient
+     */
+    public function Delete($sKey)
+    {
+        if ($this->oDriver) {
+            $this->oDriver->Delete($sKey.$this->sCacheIndex);
+        }
 
-	/**
-	 * @param \MailSo\Cache\DriverInterface $oDriver
-	 *
-	 * @return \MailSo\Cache\CacheClient
-	 */
-	public function SetDriver(\MailSo\Cache\DriverInterface $oDriver)
-	{
-		$this->oDriver = $oDriver;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * @param \MailSo\Cache\DriverInterface $oDriver
+     *
+     * @return \MailSo\Cache\CacheClient
+     */
+    public function SetDriver(\MailSo\Cache\DriverInterface $oDriver)
+    {
+        $this->oDriver = $oDriver;
 
-	/**
-	 * @param int $iTimeToClearInHours = 24
-	 *
-	 * @return bool
-	 */
-	public function gc($iTimeToClearInHours = 24)
-	{
-		return $this->oDriver ? $this->oDriver->gc($iTimeToClearInHours) : false;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function IsInited()
-	{
-		return $this->oDriver instanceof \MailSo\Cache\DriverInterface;
-	}
+    /**
+     * @param int $iTimeToClearInHours = 24
+     *
+     * @return bool
+     */
+    public function gc($iTimeToClearInHours = 24)
+    {
+        return $this->oDriver ? $this->oDriver->gc($iTimeToClearInHours) : false;
+    }
 
-	/**
-	 * @param string $sCacheIndex
-	 *
-	 * @return \MailSo\Cache\CacheClient
-	 */
-	public function SetCacheIndex($sCacheIndex)
-	{
-		$this->sCacheIndex = 0 < \strlen($sCacheIndex) ? "\x0".$sCacheIndex : '';
+    /**
+     * @return bool
+     */
+    public function IsInited()
+    {
+        return $this->oDriver instanceof \MailSo\Cache\DriverInterface;
+    }
 
-		return $this;
-	}
+    /**
+     * @param string $sCacheIndex
+     *
+     * @return \MailSo\Cache\CacheClient
+     */
+    public function SetCacheIndex($sCacheIndex)
+    {
+        $this->sCacheIndex = 0 < \strlen($sCacheIndex) ? "\x0".$sCacheIndex : '';
+
+        return $this;
+    }
 }

@@ -16,4 +16,6 @@ namespace MailSo\Base\Exceptions;
  * @package Base
  * @subpackage Exceptions
  */
-class InvalidArgumentException extends \MailSo\Base\Exceptions\Exception {}
+class InvalidArgumentException extends \MailSo\Base\Exceptions\Exception
+{
+}

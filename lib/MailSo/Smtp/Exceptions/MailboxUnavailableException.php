@@ -16,4 +16,6 @@ namespace MailSo\Smtp\Exceptions;
  * @package Smtp
  * @subpackage Exceptions
  */
-class MailboxUnavailableException extends \MailSo\Smtp\Exceptions\ResponseException {}
+class MailboxUnavailableException extends \MailSo\Smtp\Exceptions\ResponseException
+{
+}

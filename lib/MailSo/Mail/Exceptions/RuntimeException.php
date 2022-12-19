@@ -16,4 +16,6 @@ namespace MailSo\Mail\Exceptions;
  * @package Mail
  * @subpackage Exceptions
  */
-class RuntimeException extends \MailSo\Mail\Exceptions\Exception {}
+class RuntimeException extends \MailSo\Mail\Exceptions\Exception
+{
+}

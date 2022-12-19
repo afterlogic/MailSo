@@ -18,9 +18,9 @@ namespace MailSo\Mime\Enumerations;
  */
 class Parameter
 {
-	const CHARSET = 'charset';
-	const NAME = 'name';
-	const FILENAME = 'filename';
-	const BOUNDARY = 'boundary';
-	const PROTOCOL = 'protocol';
+    public const CHARSET = 'charset';
+    public const NAME = 'name';
+    public const FILENAME = 'filename';
+    public const BOUNDARY = 'boundary';
+    public const PROTOCOL = 'protocol';
 }

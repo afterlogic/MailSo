@@ -18,8 +18,8 @@ namespace MailSo\Mime\Enumerations;
  */
 class Constants
 {
-	const TAB = "\t";
-	const CRLF = "\r\n";
-	
-	const LINE_LENGTH = 74;
+    public const TAB = "\t";
+    public const CRLF = "\r\n";
+
+    public const LINE_LENGTH = 74;
 }

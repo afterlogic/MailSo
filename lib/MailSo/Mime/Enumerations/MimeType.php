@@ -18,19 +18,19 @@ namespace MailSo\Mime\Enumerations;
  */
 class MimeType
 {
-	const TEXT_PLAIN = 'text/plain';
-	const TEXT_HTML = 'text/html';
-	
-	const MULTIPART_ALTERNATIVE = 'multipart/alternative';
-	const MULTIPART_RELATED = 'multipart/related';
-	const MULTIPART_MIXED = 'multipart/mixed';
-	const MULTIPART_SIGNED = 'multipart/signed';
-	
-	const MESSAGE_RFC822 = 'message/rfc822';
-	const MESSAGE_PARTIAL = 'message/partial';
-	const MESSAGE_REPORT = 'message/report';
-	
-	const APPLICATION_MS_TNEF = 'application/ms-tnef';
-	const APPLICATION_PKCS7_MIME = 'application/pkcs7-mime';
-	const APPLICATION_PKCS7_SIGNATURE = 'application/pkcs7-signature';
+    public const TEXT_PLAIN = 'text/plain';
+    public const TEXT_HTML = 'text/html';
+
+    public const MULTIPART_ALTERNATIVE = 'multipart/alternative';
+    public const MULTIPART_RELATED = 'multipart/related';
+    public const MULTIPART_MIXED = 'multipart/mixed';
+    public const MULTIPART_SIGNED = 'multipart/signed';
+
+    public const MESSAGE_RFC822 = 'message/rfc822';
+    public const MESSAGE_PARTIAL = 'message/partial';
+    public const MESSAGE_REPORT = 'message/report';
+
+    public const APPLICATION_MS_TNEF = 'application/ms-tnef';
+    public const APPLICATION_PKCS7_MIME = 'application/pkcs7-mime';
+    public const APPLICATION_PKCS7_SIGNATURE = 'application/pkcs7-signature';
 }

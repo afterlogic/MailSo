@@ -16,4 +16,6 @@ namespace MailSo\Net\Exceptions;
  * @package Net
  * @subpackage Exceptions
  */
-class SocketReadException extends \MailSo\Net\Exceptions\Exception {}
+class SocketReadException extends \MailSo\Net\Exceptions\Exception
+{
+}

@@ -16,4 +16,6 @@ namespace MailSo\Sieve\Exceptions;
  * @package Sieve
  * @subpackage Exceptions
  */
-class RuntimeException extends \MailSo\Sieve\Exceptions\Exception {}
+class RuntimeException extends \MailSo\Sieve\Exceptions\Exception
+{
+}

@@ -16,4 +16,6 @@ namespace MailSo\Poppassd\Exceptions;
  * @package Poppassd
  * @subpackage Exceptions
  */
-class LoginBadCredentialsException extends \MailSo\Poppassd\Exceptions\NegativeResponseException {}
+class LoginBadCredentialsException extends \MailSo\Poppassd\Exceptions\NegativeResponseException
+{
+}
