@@ -58,14 +58,14 @@ class HtmlUtils
         $oDom->formatOutput = false;
 
         @$oDom->loadHTML('<'.'?xml version="1.0" encoding="utf-8"?'.'>'.
-            '<html '.$sHtmlAttrs.'><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body '.$sBodyAttrs.'>'.$sText.'</body></html>');
+            '<html '.$sHtmlAttrs.'><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body '.$sBodyAttrs.'>'.$sText.'</body></html>', LIBXML_PARSEHUGE);
 
         // Uncomment the following lines to get parsing errors in the log file.
         // Add LIBXML_PARSEHUGE as second parametr to loadHTML method if you get "Excessive depth in document: 256 use XML_PARSE_HUGE option" error
-        //		if (\MailSo\Base\Utils::FunctionExistsAndEnabled('libxml_get_errors'))
-        //		{
-        //			\Aurora\System\Api::Log(libxml_get_errors());
-        //		}
+        if (\MailSo\Base\Utils::FunctionExistsAndEnabled('libxml_get_errors'))
+        {
+            \Aurora\System\Api::Log(libxml_get_errors());
+        }
 
         return $oDom;
     }
@@ -436,7 +436,7 @@ class HtmlUtils
 
         $sHtmlAttrs = $sBodyAttrs = '';
         $sHtml = \MailSo\Base\HtmlUtils::ClearBodyAndHtmlTag($sHtml, $sHtmlAttrs, $sBodyAttrs);
-
+        $sResult = $sHtml;
         // Dom Part
         $oDom = \MailSo\Base\HtmlUtils::GetDomFromText($sHtml, $sHtmlAttrs, $sBodyAttrs);
         unset($sHtml);
@@ -454,8 +454,7 @@ class HtmlUtils
             $sResult = $oDom->saveHTML();
         }
 
-        unset($oDom);
-
+        // unset($oDom);
         $sResult = \MailSo\Base\HtmlUtils::ClearTags($sResult);
 
         $sHtmlAttrs = $sBodyAttrs = '';
