@@ -7,25 +7,15 @@
 
 namespace MailSo\Base;
 
-use Symfony\Polyfill\Intl\Idn as p;
-
 class Idn
 {
     public function encode($url)
     {
-        if (function_exists('idn_to_ascii')) {
-            return idn_to_ascii($url);
-        } else {
-            return p\Idn::idn_to_ascii($url);
-        }
+        return idn_to_ascii($url);
     }
 
     public function decode($url)
     {
-        if (function_exists('idn_to_utf8')) {
-            return idn_to_utf8($url);
-        } else {
-            return p\Idn::idn_to_utf8($url);
-        }
+        return idn_to_utf8($url);
     }
 }
