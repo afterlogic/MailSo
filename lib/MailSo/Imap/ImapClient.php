@@ -28,6 +28,11 @@ class ImapClient extends \MailSo\Net\NetClient
     private $iResponseBufParsedPos;
 
     /**
+     * @var bool
+     */
+    private $bResponseBufferChanged;
+
+    /**
      * @var int
      */
     private $iTagCount;
