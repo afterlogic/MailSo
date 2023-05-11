@@ -12,7 +12,8 @@
 	],
 	"require": {
 		"php": ">=5.3.0",
-		"symfony/polyfill-intl-idn": ">=1.27.0"
+		"symfony/polyfill-intl-idn": ">=1.27.0",
+		"masterminds/html5": "^2.8"
 	},
 	"autoload": {
         "psr-0" : {
