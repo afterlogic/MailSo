@@ -53,15 +53,14 @@ class HtmlUtils
             }
         }
 
-        // $oDom = new \DOMDocument();
-        // $oDom->encoding = 'UTF-8';
-        // $oDom->formatOutput = false;
+        $oDom = new \DOMDocument();
+        $oDom->encoding = 'UTF-8';
+        $oDom->formatOutput = false;
 
-        $oHTML5 = new \Masterminds\HTML5();
-
-        $oDom = $oHTML5->loadHTML(
+        @$oDom->loadHTML(
             '<'.'?xml version="1.0" encoding="utf-8"?'.'>'.
-            '<html '.$sHtmlAttrs.'><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body '.$sBodyAttrs.'>'.$sText.'</body></html>'
+            '<html '.$sHtmlAttrs.'><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body '.$sBodyAttrs.'>'.$sText.'</body></html>',
+            LIBXML_PARSEHUGE
         );
 
         // Uncomment the following lines to get parsing errors in the log file.
