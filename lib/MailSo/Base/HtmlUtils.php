@@ -75,6 +75,25 @@ class HtmlUtils
 
     /**
      * @param string $sHtml
+     * @param bool $bRestore = true
+     *
+     * @return string
+     */
+    public static function ProtectInlineTags($sHtml, $bRestore = false)
+    {
+        if (!$bRestore) {
+            $sHtml = \preg_replace('/(<a)(\s.+?>)/msi', '$1-custom$2', $sHtml);
+            $sHtml = \preg_replace('/<\/a>/msi', '</a-custom>', $sHtml);
+        } else {
+            $sHtml = \preg_replace('/(<a)-custom(\s.+?>)/msi', '$1$2', $sHtml);
+            $sHtml = \preg_replace('/<\/a-custom>/msi', '</a>', $sHtml);
+        }
+
+        return $sHtml;
+    }
+
+    /**
+     * @param string $sHtml
      * @param string $sHtmlAttrs = '
      * @param string $sBodyAttrs = ''
      *
@@ -441,6 +460,7 @@ class HtmlUtils
         $sHtml = \MailSo\Base\HtmlUtils::ClearBodyAndHtmlTag($sHtml, $sHtmlAttrs, $sBodyAttrs);
         $sResult = $sHtml;
         // Dom Part
+        $sHtml = \MailSo\Base\HtmlUtils::ProtectInlineTags($sHtml);
         $oDom = \MailSo\Base\HtmlUtils::GetDomFromText($sHtml, $sHtmlAttrs, $sBodyAttrs);
         unset($sHtml);
 
@@ -456,6 +476,7 @@ class HtmlUtils
 
             $sResult = $oDom->saveHTML();
         }
+        $sResult = \MailSo\Base\HtmlUtils::ProtectInlineTags($sResult, true);
 
         // unset($oDom);
         $sResult = \MailSo\Base\HtmlUtils::ClearTags($sResult);
@@ -483,6 +504,7 @@ class HtmlUtils
      */
     public static function BuildHtml($sHtml, &$aFoundCids = array(), &$mFoundDataURL = null, &$aFoundedContentLocationUrls = array())
     {
+        $sHtml = \MailSo\Base\HtmlUtils::ProtectInlineTags($sHtml);
         $oDom = \MailSo\Base\HtmlUtils::GetDomFromText($sHtml);
         unset($sHtml);
 
@@ -598,6 +620,7 @@ class HtmlUtils
         }
 
         $sResult = $oDom->saveHTML();
+        $sResult = \MailSo\Base\HtmlUtils::ProtectInlineTags($sResult, true);
         unset($oDom);
 
         $sResult = \MailSo\Base\HtmlUtils::ClearTags($sResult);
