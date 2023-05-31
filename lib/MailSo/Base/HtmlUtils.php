@@ -909,11 +909,11 @@ class HtmlUtils
             $oElement->setAttribute('src', 'javascript:false');
         }
 
-        if (\in_array($sTagNameLower, array('a', 'form', 'area'))) {
+        if (\in_array($sTagNameLower, array('a', 'a-custom', 'form', 'area'))) {
             $oElement->setAttribute('target', '_blank');
         }
 
-        if (\in_array($sTagNameLower, array('a', 'form', 'area', 'input', 'button', 'textarea'))) {
+        if (\in_array($sTagNameLower, array('a', 'a-custom', 'form', 'area', 'input', 'button', 'textarea'))) {
             $oElement->setAttribute('tabindex', '-1');
         }
 
@@ -940,7 +940,7 @@ class HtmlUtils
                 $sHref = \trim($oElement->getAttribute($sAttrName));
                 if (substr($sHref, 0, 11) === 'javascript:') {
                     $oElement->setAttribute($sAttrName, 'javascript:void(0)');
-                } elseif ('a' === $sTagNameLower) {
+                } elseif ('a' === $sTagNameLower || 'a-custom' === $sTagNameLower) {
                     $oElement->setAttribute('rel', 'external');
                     $oElement->setAttribute('class', 'external');
                 }
