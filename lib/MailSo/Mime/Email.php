@@ -239,7 +239,7 @@ class Email
     {
         return array(
             'DisplayName' => $this->sDisplayName,
-            'Email' => $this->GetEmail()
+            'Email' => $this->GetEmail(true)
         );
     }
 
