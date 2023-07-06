@@ -95,7 +95,7 @@ class ParameterCollection extends \MailSo\Base\Collection
     {
         $this->clear();
 
-        $aDataToParse = explode(';', $sRawParams);
+        $aDataToParse = preg_split('/\s*;\s*(?=(?:[^"]*"[^"]*")*[^"]*$)/', $sRawParams);
 
         foreach ($aDataToParse as $sParam) {
             $this->Add(Parameter::CreateFromParameterLine($sParam));
