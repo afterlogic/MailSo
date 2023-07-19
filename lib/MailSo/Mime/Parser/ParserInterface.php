@@ -40,7 +40,7 @@ interface ParserInterface
     public function StartParseMimePart(\MailSo\Mime\Part &$oPart);
 
     /**
-     * @param \MailSo\Mime\Part $oMimePart
+     * @param \MailSo\Mime\Part $oPart
      *
      * @return void
      */

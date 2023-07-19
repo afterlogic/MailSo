@@ -856,8 +856,6 @@ class MailClient
     }
 
     /**
-     * @param string $sSearch
-     * @param bool $bDetectGmail = true
      *
      * @return string
      */
@@ -1532,6 +1530,7 @@ class MailClient
         $aResultUids = false;
         $bUseCacheAfterSearch = true;
         $sSerializedHash = '';
+        $sSerializedLog = '';
 
         $bESortSupported = $bUseSortIfSupported && $bUseESearchOrESortRequest ? $this->oImapClient->IsSupported('ESORT') : false;
         $bESearchSupported = $bUseESearchOrESortRequest ? $this->oImapClient->IsSupported('ESEARCH') : false;
@@ -2002,7 +2001,7 @@ class MailClient
     /**
      * @param string $sPrevFolderFullNameRaw
      * @param string $sNextFolderFullNameInUtf
-     * @param bool $bSubscribeOnMove = true
+     * @param bool $bSubscribeOnRename = true
      *
      * @return \MailSo\Mail\MailClient
      *

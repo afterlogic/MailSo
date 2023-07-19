@@ -67,7 +67,7 @@ class CacheClient
 
     /**
      * @param string $sKey
-     * @param string $bClearAfterGet = false
+     * @param bool $bClearAfterGet = false
      *
      * @return string
      */

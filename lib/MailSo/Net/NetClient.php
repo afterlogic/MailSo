@@ -310,7 +310,7 @@ abstract class NetClient
     }
 
     /**
-     * @param {int} $iCryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT
+     * @param int $iCryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT
      */
     public function EnableCrypto($iCryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT)
     {

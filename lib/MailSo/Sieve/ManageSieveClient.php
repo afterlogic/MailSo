@@ -33,6 +33,16 @@ class ManageSieveClient extends \MailSo\Net\NetClient
     private $iRequestTime;
 
     /**
+     * @var array
+     */
+    private $aAuth;
+
+    /**
+     * @var array
+     */
+    private $aModules;
+
+    /**
      * @access protected
      */
     protected function __construct()
@@ -445,7 +455,7 @@ class ManageSieveClient extends \MailSo\Net\NetClient
     }
 
     /**
-     * @param string $sCommand
+     * @param mixed $mResponse
      *
      * @return void
      *

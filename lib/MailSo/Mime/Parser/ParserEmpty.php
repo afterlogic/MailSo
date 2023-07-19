@@ -46,7 +46,7 @@ class ParserEmpty implements ParserInterface
     }
 
     /**
-     * @param \MailSo\Mime\Part $oMimePart
+     * @param \MailSo\Mime\Part $oPart
      *
      * @return void
      */

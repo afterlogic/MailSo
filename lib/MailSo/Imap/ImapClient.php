@@ -291,7 +291,7 @@ class ImapClient extends \MailSo\Net\NetClient
 
     public static function GetXOAuthKeyStatic($sEmail, $sAccessToken)
     {
-        if ($sEmail == null || empty($sEmail) || $sAccessToken == null || empty($sAccessToken)) {
+        if ($sEmail == null || $sEmail == '' || $sAccessToken == null || $sAccessToken == '') {
             throw new \MailSo\Base\Exceptions\InvalidArgumentException();
         }
 
@@ -611,7 +611,8 @@ class ImapClient extends \MailSo\Net\NetClient
 
     /**
      * @param array $aResult
-     * @param bool $bIsSubscribeList
+     * @param string $sStatus
+     * @param bool $bUseListStatus
      *
      * @return array
      */
@@ -1664,7 +1665,8 @@ class ImapClient extends \MailSo\Net\NetClient
      */
     private function validateResponse($aResult)
     {
-        if (!\is_array($aResult) || 0 === $iCnt = \count($aResult)) {
+        $iCnt = \count($aResult);
+        if (!\is_array($aResult) || 0 === $iCnt) {
             $this->writeLogException(
                 new Exceptions\ResponseNotFoundException(),
                 \MailSo\Log\Enumerations\Type::WARNING,
@@ -2377,7 +2379,7 @@ class ImapClient extends \MailSo\Net\NetClient
 
     /**
      * @param string $sEndTag = null
-     * @param string $bFindCapa = false
+     * @param bool $bFindCapa = false
      *
      * @return array
      */

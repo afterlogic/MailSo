@@ -65,6 +65,11 @@ class Part
     private $sParentCharset;
 
     /**
+     * @var string
+     */
+    private $sCharset;
+
+    /**
      * @var int
      */
     private $iParseBuffer;
@@ -556,7 +561,7 @@ class Part
     }
 
     /**
-     * @return resorce
+     * @return void
      */
     public function Rewind()
     {
@@ -569,7 +574,7 @@ class Part
     }
 
     /**
-     * @return resorce
+     * @return resource
      */
     public function ToStream()
     {

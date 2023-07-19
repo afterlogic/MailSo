@@ -536,6 +536,7 @@ class Message
         $oContentDispositionParameters = null;
 
         if (0 < strlen(trim($sFileName))) {
+            /** @var ParameterCollection */
             $oContentTypeParameters =
                 ParameterCollection::NewInstance()->Add(Parameter::NewInstance(
                     \MailSo\Mime\Enumerations\Parameter::NAME,
@@ -546,6 +547,7 @@ class Message
                 $oContentTypeParameters->Add(Parameter::NewInstance($sName, $sValue));
             }
 
+            /** @var ParameterCollection */
             $oContentDispositionParameters =
                 ParameterCollection::NewInstance()->Add(Parameter::NewInstance(
                     \MailSo\Mime\Enumerations\Parameter::FILENAME,
@@ -686,9 +688,6 @@ class Message
     }
 
     /**
-     * @param \MailSo\Mime\Part $oPlainPart
-     * @param \MailSo\Mime\Part $oHtmlPart
-     *
      * @return \MailSo\Mime\Part
      */
     private function createNewMessageSimpleOrAlternativeBody()

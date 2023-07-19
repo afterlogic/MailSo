@@ -16,8 +16,14 @@ namespace MailSo\Base\Exceptions;
  * @package Base
  * @subpackage Exceptions
  */
+
 class Exception extends \Exception
 {
+    /** 
+     * @var bool
+     */
+    public $__LOGINNED__;
+
     /**
      * @param string $sMessage
      * @param int $iCode
@@ -25,6 +31,7 @@ class Exception extends \Exception
      */
     public function __construct($sMessage = '', $iCode = 0, $oPrevious = null)
     {
+        $this->__LOGINNED__ = false;
         $sMessage = 0 === strlen($sMessage) ? str_replace('\\', '-', get_class($this))
 //			.' ('. basename($this->getFile()).' ~ '.$this->getLine().')'
                 : $sMessage;

@@ -51,8 +51,7 @@ class Parameter
     }
 
     /**
-     * @param string $sName
-     * @param string $sValue = ''
+     * @param string $sRawParam
      *
      * @return \MailSo\Mime\Parameter
      */

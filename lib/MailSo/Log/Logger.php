@@ -123,7 +123,7 @@ class Logger extends \MailSo\Base\Collection
 	/**
 	 * @param string $sWord
 	 *
-	 * @return bool
+	 * @return void
 	 */
 	public function AddSecret($sWord)
 	{
@@ -318,7 +318,7 @@ class Logger extends \MailSo\Base\Collection
 	 */
 	public function WriteException($oException, $iType = \MailSo\Log\Enumerations\Type::NOTICE, $sName = '', $bSearchSecretWords = true)
 	{
-		if ($oException instanceof \Exception)
+		if ($oException instanceof \MailSo\Base\Exceptions\Exception)
 		{
 			if (isset($oException->__LOGINNED__))
 			{
@@ -348,7 +348,7 @@ class Logger extends \MailSo\Base\Collection
 		$iType = null === $iType ? \MailSo\Log\Enumerations\Type::INFO : $iType;
 		if (\is_array($mData) || \is_object($mData))
 		{
-			if ($mData instanceof \Exception)
+			if ($mData instanceof \MailSo\Base\Exceptions\Exception)
 			{
 				$iType = null === $iType ? \MailSo\Log\Enumerations\Type::NOTICE : $iType;
 				return $this->WriteException($mData, $iType, $sName, $bSearchSecretWords);

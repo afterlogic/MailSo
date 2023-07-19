@@ -36,7 +36,7 @@ class PartCollection extends \MailSo\Base\Collection
     /**
      * @param string $sBoundary
      *
-     * @return resorce
+     * @return resource
      */
     public function ToStream($sBoundary)
     {

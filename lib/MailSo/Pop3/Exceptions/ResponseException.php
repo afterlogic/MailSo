@@ -47,7 +47,7 @@ class ResponseException extends \MailSo\Pop3\Exceptions\Exception
     }
 
     /**
-     * @return \MailSo\Pop3\Response | null
+     * @return mixed | null
      */
     public function GetLastResponse()
     {

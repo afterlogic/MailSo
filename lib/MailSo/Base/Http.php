@@ -80,7 +80,7 @@ class Http
      */
     public function GetQueryAsArray()
     {
-        return isset($_GET) && \is_array($_GET) ? \MailSo\Base\Utils::StripSlashesValue($_GET, true) : null;
+        return \is_array($_GET) ? \MailSo\Base\Utils::StripSlashesValue($_GET, true) : null;
     }
 
     /**
@@ -110,7 +110,7 @@ class Http
      */
     public function GetPostAsArray()
     {
-        return isset($_POST) && \is_array($_POST) ? \MailSo\Base\Utils::StripSlashesValue($_POST, false) : null;
+        return \is_array($_POST) ? \MailSo\Base\Utils::StripSlashesValue($_POST, false) : null;
     }
 
     /**
@@ -290,9 +290,7 @@ class Http
     }
 
     /**
-     * @param string $sHeader
-     *
-     * @return string
+     * @return array
      */
     public function GetHeaders()
     {
@@ -668,7 +666,7 @@ class Http
         $bResult = false;
         if (0 < $iExpireTime) {
             $iUtcTimeStamp = \time();
-            $sIfModifiedSince = $this->GetHeader('If-Modified-Since', '');
+            $sIfModifiedSince = $this->GetHeader('If-Modified-Since');
             if (0 === \strlen($sIfModifiedSince)) {
                 if ($bSetCacheHeader) {
                     \header('Cache-Control: public', true);

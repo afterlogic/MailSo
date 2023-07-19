@@ -59,6 +59,11 @@ class SubStreams
     private $sHash;
 
     /**
+     * @var resource
+     */
+    private $context;
+
+    /**
      * @param array $aSubStreams
      *
      * @return resource|bool

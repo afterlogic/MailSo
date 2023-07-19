@@ -558,7 +558,7 @@ class SmtpClient extends \MailSo\Net\NetClient
     {
         if ($this->bUnreadBuffer) {
             $this->writeLogException(
-                new \Mailso\Net\Exceptions\SocketUnreadBufferException(),
+                new \MailSo\Net\Exceptions\SocketUnreadBufferException(),
                 \MailSo\Log\Enumerations\Type::ERROR,
                 true
             );
@@ -577,7 +577,7 @@ class SmtpClient extends \MailSo\Net\NetClient
             $this->IsConnected(true);
 
             $this->writeLogException(
-                new \Mailso\Net\Exceptions\SocketWriteException(),
+                new \MailSo\Net\Exceptions\SocketWriteException(),
                 \MailSo\Log\Enumerations\Type::ERROR,
                 true
             );

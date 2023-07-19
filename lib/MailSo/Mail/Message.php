@@ -575,7 +575,7 @@ class Message
     }
 
     /**
-     * @return boole
+     * @return bool
      */
     public function TextPartIsTrimmed()
     {

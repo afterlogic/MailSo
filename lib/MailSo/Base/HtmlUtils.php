@@ -193,7 +193,7 @@ class HtmlUtils
      * @param array $aContentLocationUrls
      * @param array $aFoundedContentLocationUrls
      * @param bool $bDoNotReplaceExternalUrl = false
-     * @param callback|null $fAdditionalExternalFilter = null
+     * @param callable|null $fAdditionalExternalFilter = null
      *
      * @return string
      */
@@ -338,7 +338,7 @@ class HtmlUtils
             unset($oSubItem);
 
             foreach ($aTextNodes as $oTextNode) {
-                if ($oTextNode && 0 < \strlen($oTextNode->wholeText)/* && \preg_match('/http[s]?:\/\//i', $oTextNode->wholeText)*/) {
+                if ($oTextNode instanceof \DOMText && 0 < \strlen($oTextNode->wholeText)/* && \preg_match('/http[s]?:\/\//i', $oTextNode->wholeText)*/) {
                     $sText = \MailSo\Base\LinkFinder::NewInstance()
                         ->Text($oTextNode->wholeText)
                         ->UseDefaultWrappers(true)
@@ -353,9 +353,8 @@ class HtmlUtils
                             if ($oBodyChildNodes && $oBodyChildNodes->length) {
                                 for ($iIndex = 0, $iLen = $oBodyChildNodes->length; $iIndex < $iLen; $iIndex++) {
                                     $oSubItem = $oBodyChildNodes->item($iIndex);
-                                    if ($oSubItem) {
-                                        if (XML_ELEMENT_NODE === $oSubItem->nodeType &&
-                                            'a' === \strtolower($oSubItem->tagName)) {
+                                    if ($oSubItem instanceof \DOMElement) {
+                                        if ('a' === \strtolower($oSubItem->tagName)) {
                                             $oLink = self::$oDom->createElement(
                                                 'a',
                                                 \str_replace(':', \MailSo\Base\HtmlUtils::$KOS, \htmlspecialchars($oSubItem->nodeValue))
@@ -419,7 +418,7 @@ class HtmlUtils
      * @param array $aFoundedContentLocationUrls = array()
      * @param bool $bDoNotReplaceExternalUrl = false
      * @param bool $bCreateHtmlLinksFromTextLinksInDOM = false
-     * @param callback|null $fAdditionalExternalFilter = null
+     * @param callable|null $fAdditionalExternalFilter = null
      *
      * @return string
      */

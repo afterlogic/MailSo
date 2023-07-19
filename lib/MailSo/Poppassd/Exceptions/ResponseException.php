@@ -47,7 +47,7 @@ class ResponseException extends \MailSo\Poppassd\Exceptions\Exception
     }
 
     /**
-     * @return \MailSo\Poppassd\Response | null
+     * @return mixed | null
      */
     public function GetLastResponse()
     {

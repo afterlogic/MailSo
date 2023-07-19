@@ -188,4 +188,14 @@ class ParameterCollection extends \MailSo\Base\Collection
             $this->Add(Parameter::NewInstance($sName, $sResult));
         }
     }
+
+    /**
+     * @param mixed $mItem
+     * @param bool $bToTop = false
+     * @return ParameterCollection
+     */
+    public function Add($mItem, $bToTop = false)
+    {
+        return parent::Add($mItem, $bToTop);
+    }
 }

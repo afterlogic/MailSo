@@ -33,7 +33,7 @@ abstract class Collection
     /**
      * @param mixed $mItem
      * @param bool $bToTop = false
-     * @return this
+     * @return Collection
      */
     public function Add($mItem, $bToTop = false)
     {

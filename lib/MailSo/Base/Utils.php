@@ -622,6 +622,7 @@ END;
 				}
 			}
 
+			$sCharset = '';
 			if (0 < \strlen($aTempArr[0]))
 			{
 				$sCharset = 0 === \strlen($sForcedIncomingCharset) ? $aTempArr[0] : $sForcedIncomingCharset;
@@ -950,10 +951,8 @@ END;
 
 			// fonts
 			'psf'	=> 'application/x-font-linux-psf',
-			'otf'	=> 'application/x-font-otf',
 			'pcf'	=> 'application/x-font-pcf',
 			'snf'	=> 'application/x-font-snf',
-			'ttf'	=> 'application/x-font-ttf',
 			'ttc'	=> 'application/x-font-ttf',
 			'woff'	=> 'application/font-woff',
 			'ttf'	=> 'application/font-ttf',
@@ -1265,7 +1264,7 @@ END;
 
 		if (!\is_string($sResult) || '' === $sResult)
 		{
-			if (!$oLogger && \MailSo\Log\Logger::IsSystemEnabled())
+			if (!$oLogger && isset(\MailSo\Config::$SystemLogger))
 			{
 				$oLogger = \MailSo\Config::$SystemLogger;
 			}
@@ -1417,6 +1416,7 @@ END;
 		$sTempPath = rtrim($sTempPath, '\\/');
 		if (@\is_dir($sTempPath))
 		{
+			$bRemoveAllDirs = false;
 			$rDirH = @\opendir($sTempPath);
 			if ($rDirH)
 			{
@@ -1773,7 +1773,8 @@ END;
 	/**
 	 *
 	 * @param resource $fResource
-	 * @param int $iBufferLen = 8192
+	 * @param int $iPartLen = 8192
+	 * @param int $iOffset = 0
 	 *
 	 * @return bool
 	 */

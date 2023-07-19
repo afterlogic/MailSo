@@ -277,7 +277,7 @@ class Pop3Client extends \MailSo\Net\NetClient
      * @param string $sCommand
      * @param string $sAddToCommand = ''
      *
-     * @return \MailSo\Pop3\Pop3Client
+     * @return void
      *
      * @throws \MailSo\Base\Exceptions\InvalidArgumentException
      * @throws \MailSo\Net\Exceptions\Exception
@@ -286,11 +286,11 @@ class Pop3Client extends \MailSo\Net\NetClient
     private function sendRequestWithCheck($sCommand, $sAddToCommand = '')
     {
         $this->sendRequest($sCommand, $sAddToCommand);
-        return $this->validateResponse();
+        $this->validateResponse();
     }
 
     /**
-     * @return string
+     * @return void
      *
      * @throws \MailSo\Net\Exceptions\Exception
      * @throws \MailSo\Pop3\Exceptions\ResponseException

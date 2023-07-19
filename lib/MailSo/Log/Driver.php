@@ -188,7 +188,7 @@ abstract class Driver
      * @param string $sTimePrefix
      * @param string $sDesc
      * @param int $iType = \MailSo\Log\Enumerations\Type::INFO
-     * @param array $sName = ''
+     * @param string $sName = ''
      *
      * @return string
      */
@@ -220,7 +220,7 @@ abstract class Driver
     {
         $aMicroTimeItems = \explode(' ', \microtime());
         return \gmdate($this->sDatePattern, $aMicroTimeItems[1]).'.'.
-            \str_pad((int) ($aMicroTimeItems[0] * 1000), 3, '0', STR_PAD_LEFT);
+            \str_pad((int) $aMicroTimeItems[0] * 1000, 3, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -268,21 +268,6 @@ abstract class Driver
 
             if ($bError || $bErrorPhp) {
                 $sFlush = '--- FlushLogCache: '.($bError ? 'WriteOnErrorOnly' : 'WriteOnPhpErrorOnly');
-                if (isset($this->aCache[0]) && empty($this->aCache[0])) {
-                    $this->aCache[0] = $sFlush;
-                    array_unshift($this->aCache, '');
-                } else {
-                    array_unshift($this->aCache, $sFlush);
-                }
-
-                $this->aCache[] = '--- FlushLogCache: Trigger';
-                $this->aCache[] = $this->loggerLineImplementation($this->getTimeWithMicroSec(), $sDesc, $iType, $sName);
-
-                $this->bFlushCache = true;
-                $bResult = $this->writeImplementation($this->aCache);
-                $this->aCache = array();
-            } elseif (0 < $this->iWriteOnTimeoutOnly && \time() - APP_START_TIME > $this->iWriteOnTimeoutOnly) {
-                $sFlush = '--- FlushLogCache: WriteOnTimeoutOnly ['.(\time() - APP_START_TIME).'sec]';
                 if (isset($this->aCache[0]) && empty($this->aCache[0])) {
                     $this->aCache[0] = $sFlush;
                     array_unshift($this->aCache, '');

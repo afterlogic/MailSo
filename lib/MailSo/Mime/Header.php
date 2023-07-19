@@ -43,7 +43,7 @@ class Header
     private $oParameters;
 
     /**
-     * @var strign
+     * @var string
      */
     private $sParentCharset;
 

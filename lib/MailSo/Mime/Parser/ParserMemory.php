@@ -24,7 +24,7 @@ class ParserMemory extends ParserEmpty implements ParserInterface
     protected $oCurrentMime = null;
 
     /**
-     * @param \MailSo\Mime\Part $oMimePart
+     * @param \MailSo\Mime\Part $oPart
      *
      * @return void
      */
