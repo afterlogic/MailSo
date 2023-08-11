@@ -280,4 +280,9 @@ class Email
 
         return \trim($sReturn);
     }
+
+    public function __toString()
+    {
+        return $this->ToString(false, true);
+    }
 }

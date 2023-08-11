@@ -65,8 +65,7 @@ class HtmlUtils
 
         // Uncomment the following lines to get parsing errors in the log file.
         // Add LIBXML_PARSEHUGE as second parametr to loadHTML method if you get "Excessive depth in document: 256 use XML_PARSE_HUGE option" error
-        if (\MailSo\Base\Utils::FunctionExistsAndEnabled('libxml_get_errors'))
-        {
+        if (\MailSo\Base\Utils::FunctionExistsAndEnabled('libxml_get_errors')) {
             \Aurora\System\Api::Log(libxml_get_errors());
         }
 
@@ -383,6 +382,11 @@ class HtmlUtils
                 }
             }
         }
+    }
+
+    public static function CreateClickableLinksFromPlane($s)
+    {
+        return preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1" target="_blank">$1</a>', $s);
     }
 
     /**

@@ -19,7 +19,7 @@ namespace MailSo\Base\Exceptions;
 
 class Exception extends \Exception
 {
-    /** 
+    /**
      * @var bool
      */
     public $__LOGINNED__;

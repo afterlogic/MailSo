@@ -165,7 +165,7 @@ class MailClient
         return \MailSo\Imap\Enumerations\FetchType::BODY_HEADER_PEEK;
 
         //		return \MailSo\Imap\Enumerations\FetchType::ENVELOPE;
-//
+        //
         //		return \MailSo\Imap\Enumerations\FetchType::BuildBodyCustomHeaderRequest(array(
         //			\MailSo\Mime\Enumerations\Header::RETURN_PATH,
         //			\MailSo\Mime\Enumerations\Header::RECEIVED,
