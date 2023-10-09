@@ -145,42 +145,15 @@ class HtmlUtils
     }
 
     /**
+     * @deprecated since version 9.7.5
+     * 
      * @param string $sHtml
      *
      * @return string
      */
     public static function ClearOn($sHtml)
     {
-        $aToReplace = array(
-            '/on(Blur)/si',
-            '/on(Change)/si',
-            '/on(Click)/si',
-            '/on(DblClick)/si',
-            '/on(Error)/si',
-            '/on(Focus)/si',
-            '/on(FormChange)/si',
-            '/on(KeyDown)/si',
-            '/on(KeyPress)/si',
-            '/on(KeyUp)/si',
-            '/on(Load)/si',
-            '/on(MouseDown)/si',
-            '/on(MouseEnter)/si',
-            '/on(MouseLeave)/si',
-            '/on(MouseMove)/si',
-            '/on(MouseOut)/si',
-            '/on(MouseOver)/si',
-            '/on(MouseUp)/si',
-            '/on(Move)/si',
-            '/on(Resize)/si',
-            '/on(ResizeEnd)/si',
-            '/on(ResizeStart)/si',
-            '/on(Scroll)/si',
-            '/on(Select)/si',
-            '/on(Submit)/si',
-            '/on(Unload)/si'
-        );
-
-        return \preg_replace($aToReplace, 'оn\\1', $sHtml);
+        return $sHtml;
     }
 
     /**
@@ -452,7 +425,6 @@ class HtmlUtils
         self::$bHasExternals = false;
 
         $sHtml = \MailSo\Base\HtmlUtils::ClearTags($sHtml);
-        $sHtml = \MailSo\Base\HtmlUtils::ClearOn($sHtml);
 
         $sHtmlAttrs = $sBodyAttrs = '';
         $sHtml = \MailSo\Base\HtmlUtils::ClearBodyAndHtmlTag($sHtml, $sHtmlAttrs, $sBodyAttrs);
