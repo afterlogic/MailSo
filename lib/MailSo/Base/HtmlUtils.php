@@ -73,6 +73,9 @@ class HtmlUtils
     }
 
     /**
+     * This method is used to prevent DomDocument class from removing block elements 
+     * nested to "a" tags that are inline ones. It allows to convert "a" tags custom tags and bask.
+     * 
      * @param string $sHtml
      * @param bool $bRestore = true
      *
