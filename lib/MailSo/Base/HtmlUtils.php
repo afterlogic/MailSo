@@ -447,7 +447,8 @@ class HtmlUtils
                 }
             }
 
-            $sResult = $oDom->saveHTML();
+            // Provided argument fixes encoding of non-latin symbols
+            $sResult = $oDom->saveHTML((new \DOMXPath($oDom))->query('/')->item(0));
         }
         $sResult = \MailSo\Base\HtmlUtils::ProtectInlineTags($sResult, true);
 
