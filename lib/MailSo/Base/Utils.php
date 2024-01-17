@@ -384,16 +384,16 @@ END;
 
             case ($sFromEncoding === \MailSo\Base\Enumerations\Charset::ISO_8859_1 &&
                     $sToEncoding === \MailSo\Base\Enumerations\Charset::UTF_8 &&
-                    \function_exists('utf8_encode')):
+                    \function_exists('mb_convert_encoding')):
 
-                $sResult = \utf8_encode($sResult);
+                $sResult = \mb_convert_encoding($sResult, $sToEncoding, $sFromEncoding);
                 break;
 
             case ($sFromEncoding === \MailSo\Base\Enumerations\Charset::UTF_8 &&
                     $sToEncoding === \MailSo\Base\Enumerations\Charset::ISO_8859_1 &&
-                    \function_exists('utf8_decode')):
+                    \function_exists('mb_convert_encoding')):
 
-                $sResult = \utf8_decode($sResult);
+                $sResult = \mb_convert_encoding($sResult, $sToEncoding, $sFromEncoding);
                 break;
 
             case ($sFromEncoding === \MailSo\Base\Enumerations\Charset::UTF_7_IMAP &&
