@@ -799,19 +799,29 @@ class BodyStructure
      */
     private static function findPartByIndexInArray(array $aList, $sPartID)
     {
-        $bFind = false;
-        $aPath = \explode('.', ''.$sPartID);
-        $aCurrentPart = $aList;
-
-        foreach ($aPath as $iPos => $iNum) {
-            $iIndex = \intval($iNum) - 1;
-            if (0 <= $iIndex && 0 < $iPos ? isset($aCurrentPart[8][$iIndex]) : isset($aCurrentPart[$iIndex])) {
-                $aCurrentPart = 0 < $iPos ? $aCurrentPart[8][$iIndex] : $aCurrentPart[$iIndex];
-                $bFind = true;
-            }
+        if (!is_array($aList)) {
+            return null;
         }
 
-        return $bFind ? $aCurrentPart : null;
+        if (empty($sPartID)) {
+            return $aList;
+        }
+
+        $ctype = is_string($aList[0]) && is_string($aList[1]) ? $aList[0] . '/' . $aList[1] : '';
+        if (strcasecmp($ctype, \MailSo\Mime\Enumerations\MimeType::MESSAGE_RFC822) == 0) {
+            $aList = $aList[8];
+        }
+
+        if (strpos($sPartID, '.') > 0) {
+            $origPart = $sPartID;
+            $pos = strpos($sPartID, '.');
+            $rest = substr($origPart, $pos + 1);
+            $sPartID = substr($origPart, 0, $pos);
+
+            return self::findPartByIndexInArray($aList[$sPartID - 1], $rest);
+        } elseif ($sPartID > 0) {
+            return is_array($aList[$sPartID - 1]) ? $aList[$sPartID - 1] : $aList;
+        }
     }
 
     /**
