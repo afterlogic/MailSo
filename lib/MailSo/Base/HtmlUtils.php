@@ -899,13 +899,20 @@ class HtmlUtils
         }
 
         foreach (array(
-            'load', 'blur', 'error', 'focus', 'formchange', 'change', 'start',
-            'copy', 'contextmenu', 'drag', 'cut', 'paste',
-            'click', 'dblclick', 'keydown', 'keypress', 'keyup',
-            'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup',
-            'move', 'resize', 'resizeend', 'resizestart', 'scroll', 'select', 'submit', 'upload'
+            'onload', 'onblur', 'onerror', 'onfocus', 'onformchange', 'onchange', 'onstart',
+            'oncopy', 'oncontextmenu', 'ondrag', 'oncut', 'onpaste',
+            'onclick', 'ondblclick', 'onkeydown', 'onkeypress', 'onkeyup',
+            'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup',
+            'onmove', 'onresize', 'onresizeend', 'onresizestart', 'onscroll', 'onselect', 'onsubmit', 'onupload',
+            'onfinish', 'onbounce', 'onabort', 'onafterprint', 'onbeforeprint', 'onbeforeunload', 'oncanplay',
+            'oncanplaythrough', 'oncuechange', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart',
+            'ondrop', 'ondurationchange', 'onemptied', 'onended', 'onhashchange', 'oninput', 'oninvalid', 'onloadeddata',
+            'onloadedmetadata', 'onloadstart', 'onmousewheel', 'onoffline', 'ononline', 'onpagehide', 'onpageshow',
+            'onpause', 'onplay', 'onplaying', 'onpopstate', 'onprogress', 'onratechange', 'onreset', 'onsearch',
+            'onseeked', 'onseeking', 'onstalled', 'onstorage', 'onsuspend', 'ontimeupdate', 'ontoggle', 'onunload',
+            'onvolumechange', 'onwaiting', 'onwheel'
         ) as $sAttr) {
-            @$oElement->removeAttribute('on'.$sAttr);
+            @$oElement->removeAttribute($sAttr);
         }
 
         $aNotJsAttrs = ['href', 'action'];
