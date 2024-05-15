@@ -171,41 +171,50 @@ END;
      */
     public static function NormalizeCharset($sEncoding, $bAsciAsUtf8 = false)
     {
+        $sEncoding = isset($sEncoding) ? $sEncoding : \MailSo\Base\Enumerations\Charset::UTF_8; // set the utf-8 charset if it not defined in the mail message
         $sEncoding = \strtolower($sEncoding);
-        switch ($sEncoding) {
-            case 'asci':
-            case 'ascii':
-            case 'us-asci':
-            case 'us-ascii':
-                $sEncoding = $bAsciAsUtf8 ? \MailSo\Base\Enumerations\Charset::UTF_8 :
-                    \MailSo\Base\Enumerations\Charset::ISO_8859_1;
-                break;
-            case 'unicode-1-1-utf-7':
-                $sEncoding = \MailSo\Base\Enumerations\Charset::UTF_7;
-                break;
-            case 'utf8':
-            case 'utf-8':
-                $sEncoding = \MailSo\Base\Enumerations\Charset::UTF_8;
-                break;
-            case 'utf7imap':
-            case 'utf-7imap':
-            case 'utf7-imap':
-            case 'utf-7-imap':
-                $sEncoding = \MailSo\Base\Enumerations\Charset::UTF_7_IMAP;
-                break;
-            case 'ks-c-5601-1987':
-            case 'ks_c_5601-1987':
-            case 'ks_c_5601_1987':
-                $sEncoding = 'euc-kr';
-                break;
-            case 'x-gbk':
-                $sEncoding = 'gb2312';
-                break;
-            case 'iso-8859-i':
-            case 'iso-8859-8-i':
-                $sEncoding = \MailSo\Base\Enumerations\Charset::ISO_8859_8;
-                break;
-        }
+
+        $sEncoding = \preg_replace('/^iso8/', 'iso-8', $sEncoding);
+		$sEncoding = \preg_replace('/^cp-([\d])/', 'cp$1', $sEncoding);
+		$sEncoding = \preg_replace('/^windows?12/', 'windows-12', $sEncoding);
+
+		switch ($sEncoding)
+		{
+			case 'asci':
+			case 'ascii':
+			case 'us-asci':
+			case 'us-ascii':
+				$sEncoding = $bAsciAsUtf8 ? \MailSo\Base\Enumerations\Charset::UTF_8 :
+					\MailSo\Base\Enumerations\Charset::ISO_8859_1;
+				break;
+			case 'unicode-1-1-utf-7':
+			case 'unicode-1-utf-7':
+			case 'unicode-utf-7':
+				$sEncoding = \MailSo\Base\Enumerations\Charset::UTF_7;
+				break;
+			case 'utf8':
+			case 'utf-8':
+				$sEncoding = \MailSo\Base\Enumerations\Charset::UTF_8;
+				break;
+			case 'utf7imap':
+			case 'utf-7imap':
+			case 'utf7-imap':
+			case 'utf-7-imap':
+				$sEncoding = \MailSo\Base\Enumerations\Charset::UTF_7_IMAP;
+				break;
+			case 'ks-c-5601-1987':
+			case 'ks_c_5601-1987':
+			case 'ks_c_5601_1987':
+				$sEncoding = 'euc-kr';
+				break;
+			case 'x-gbk':
+				$sEncoding = 'gb2312';
+				break;
+			case 'iso-8859-i':
+			case 'iso-8859-8-i':
+				$sEncoding = \MailSo\Base\Enumerations\Charset::ISO_8859_8;
+				break;
+		}
 
         return $sEncoding;
     }
@@ -382,19 +391,19 @@ END;
                 $bUnknown = true;
                 break;
 
-            case ($sFromEncoding === \MailSo\Base\Enumerations\Charset::ISO_8859_1 &&
-                    $sToEncoding === \MailSo\Base\Enumerations\Charset::UTF_8 &&
-                    \function_exists('mb_convert_encoding')):
+			case ($sFromEncoding === \MailSo\Base\Enumerations\Charset::ISO_8859_1 &&
+					$sToEncoding === \MailSo\Base\Enumerations\Charset::UTF_8 &&
+					\function_exists('utf8_encode')):
 
-                $sResult = \mb_convert_encoding($sResult, $sToEncoding, $sFromEncoding);
-                break;
+				$sResult = \utf8_encode($sResult);
+				break;
 
-            case ($sFromEncoding === \MailSo\Base\Enumerations\Charset::UTF_8 &&
-                    $sToEncoding === \MailSo\Base\Enumerations\Charset::ISO_8859_1 &&
-                    \function_exists('mb_convert_encoding')):
+			case ($sFromEncoding === \MailSo\Base\Enumerations\Charset::UTF_8 &&
+					$sToEncoding === \MailSo\Base\Enumerations\Charset::ISO_8859_1 &&
+					\function_exists('utf8_decode')):
 
-                $sResult = \mb_convert_encoding($sResult, $sToEncoding, $sFromEncoding);
-                break;
+				$sResult = \utf8_decode($sResult);
+				break;
 
             case ($sFromEncoding === \MailSo\Base\Enumerations\Charset::UTF_7_IMAP &&
                     $sToEncoding === \MailSo\Base\Enumerations\Charset::UTF_8):
@@ -550,7 +559,7 @@ END;
 
         $aEncodeArray = array('');
         $aMatch = array();
-        \preg_match_all('/=\?[^\?]+\?[q|b|Q|B]\?[^\?]*(\?=)/', $sValue, $aMatch);
+        \preg_match_all('/=\?[^\?]+\?[q|b|Q|B]\?.*?\?=/', $sValue, $aMatch);
 
         if (isset($aMatch[0]) && \is_array($aMatch[0])) {
             for ($iIndex = 0, $iLen = \count($aMatch[0]); $iIndex < $iLen; $iIndex++) {
@@ -786,7 +795,7 @@ END;
     {
         $sResult = '';
         if (0 < \strlen($sEmail)) {
-            $iPos = \strpos($sEmail, '@');
+            $iPos = \strrpos($sEmail, '@');
             if (false !== $iPos && 0 < $iPos) {
                 $sResult = \substr($sEmail, $iPos + 1);
             }
@@ -2166,7 +2175,7 @@ END;
      */
     public static function IdnToUtf8($sStr, $bLowerIfAscii = false)
     {
-        if (0 < \strlen($sStr) && \preg_match('/(^|\.)xn--/i', $sStr)) {
+        if (0 < \strlen($sStr) && \preg_match('/(^|\.|@)xn--/i', $sStr)) {
             try {
                 $sStr = $bLowerIfAscii ? \MailSo\Base\Utils::StrToLowerIfAscii($sStr) : $sStr;
 
