@@ -1087,6 +1087,12 @@ class HtmlUtils
 					self::$aFoundCIDs, self::$aContentLocationUrls, self::$aFoundedContentLocationUrls, self::$bDoNotReplaceExternalUrl, self::$fAdditionalExternalFilter));
 		}
 
+		// set max-width: 100% for images to avoid overflowing the message view area
+		if ('img' === $sTagNameLower) {
+			$sStyles = $oElement->getAttribute('style');
+			$oElement->setAttribute('style', ($sStyles ? rtrim($sStyles, ';') . '; ' : '') . 'max-width: 100%');
+		}
+
 		if ($oElement->hasAttribute('cursor'))
 		{
 			$sCursor = $oElement->getAttribute('style');
