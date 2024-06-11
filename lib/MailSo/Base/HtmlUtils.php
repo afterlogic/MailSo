@@ -320,7 +320,7 @@ class HtmlUtils
                         ->CompileText()
                     ;
 
-                    $oSubDom = \MailSo\Base\HtmlUtils::GetDomFromText('<html><body>'.$sText.'</body></html>');
+                    $oSubDom = \MailSo\Base\HtmlUtils::GetDomFromText($sText);
                     if ($oSubDom) {
                         $oBodyNodes = $oSubDom->getElementsByTagName('body');
                         if ($oBodyNodes && 0 < $oBodyNodes->length) {
@@ -341,13 +341,10 @@ class HtmlUtils
                                             }
 
                                             $oElement->insertBefore($oLink, $oTextNode);
-                                        } else {
-                                            $oElement->insertBefore(self::$oDom->importNode($oSubItem), $oTextNode);
+                                            $oElement->removeChild($oTextNode);
                                         }
                                     }
                                 }
-
-                                $oElement->removeChild($oTextNode);
                             }
                         }
 
