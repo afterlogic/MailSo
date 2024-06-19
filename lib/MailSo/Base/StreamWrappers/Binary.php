@@ -68,6 +68,8 @@ class Binary
      */
     private $sReadEndBuffer;
 
+    public $context;
+
     /**
      * @param string $sContentTransferEncoding
      * @param bool $bDecode = true
@@ -235,7 +237,7 @@ class Binary
 
         \MailSo\Base\Loader::IncStatistic('CreateStream/Binary');
 
-        return \fopen(self::STREAM_NAME.'://'.$sHashName, 'rb');
+        return \fopen(self::STREAM_NAME.'://'.$sHashName, 'rb', false, null);
     }
 
     /**

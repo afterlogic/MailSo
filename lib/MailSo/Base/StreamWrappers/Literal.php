@@ -43,6 +43,8 @@ class Literal
      */
     private $iPos;
 
+    public $context;
+
     /**
      * @param resource $rStream
      * @param int $iLiteralLen
@@ -61,7 +63,7 @@ class Literal
 
         \MailSo\Base\Loader::IncStatistic('CreateStream/Literal');
 
-        return fopen(self::STREAM_NAME.'://'.$sHashName, 'rb');
+        return fopen(self::STREAM_NAME.'://'.$sHashName, 'rb', false, null);
     }
 
     /**

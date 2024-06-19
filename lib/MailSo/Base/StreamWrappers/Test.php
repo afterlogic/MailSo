@@ -33,6 +33,8 @@ class Test
      */
     private $rReadSream;
 
+    public $context;
+
     /**
      * @param string $sRawResponse
      *
