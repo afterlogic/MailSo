@@ -888,28 +888,21 @@ class HtmlUtils
             $oElement->setAttribute('tabindex', '-1');
         }
 
-        foreach (array(
-            'id', 'class', 'contenteditable', 'designmode', 'formaction', 'data-bind', 'xmlns',
-            'srcset'
-        ) as $sAttr) {
-            @$oElement->removeAttribute($sAttr);
+        $aForbiddenAttributes = array(
+            'id', 'class', 'contenteditable', 'designmode', 'formaction', 'data-bind', 'xmlns', 'srcset'
+        );
+
+        foreach ($aForbiddenAttributes as $sAttributeName) {
+            @$oElement->removeAttribute($sAttributeName);
         }
 
-        foreach (array(
-            'onload', 'onblur', 'onerror', 'onfocus', 'onformchange', 'onchange', 'onstart',
-            'oncopy', 'oncontextmenu', 'ondrag', 'oncut', 'onpaste',
-            'onclick', 'ondblclick', 'onkeydown', 'onkeypress', 'onkeyup',
-            'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup',
-            'onmove', 'onresize', 'onresizeend', 'onresizestart', 'onscroll', 'onselect', 'onsubmit', 'onupload',
-            'onfinish', 'onbounce', 'onabort', 'onafterprint', 'onbeforeprint', 'onbeforeunload', 'oncanplay',
-            'oncanplaythrough', 'oncuechange', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart',
-            'ondrop', 'ondurationchange', 'onemptied', 'onended', 'onhashchange', 'oninput', 'oninvalid', 'onloadeddata',
-            'onloadedmetadata', 'onloadstart', 'onmousewheel', 'onoffline', 'ononline', 'onpagehide', 'onpageshow',
-            'onpause', 'onplay', 'onplaying', 'onpopstate', 'onprogress', 'onratechange', 'onreset', 'onsearch',
-            'onseeked', 'onseeking', 'onstalled', 'onstorage', 'onsuspend', 'ontimeupdate', 'ontoggle', 'onunload',
-            'onvolumechange', 'onwaiting', 'onwheel'
-        ) as $sAttr) {
-            @$oElement->removeAttribute($sAttr);
+        if (isset($oElement->attributes)) {
+            foreach ($oElement->attributes as $sAttributeName => /* @var $oAttributeNode \DOMNode */ $oAttributeNode) {
+                $sAttributeNameLower = \strtolower($sAttributeName);
+                if (!!preg_match('/^\s*on.+$/m', $sAttributeNameLower)) {
+                    @$oElement->removeAttribute($sAttributeNameLower);
+                }
+            }
         }
 
         $aNotJsAttrs = ['href', 'action'];
