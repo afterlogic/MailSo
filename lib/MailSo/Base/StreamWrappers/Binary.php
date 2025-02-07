@@ -104,25 +104,29 @@ class Binary
 		return $sBodyString;
 	}
 
-	/**
-	 * @param string $sBaseString
-	 * @param string $sEndBuffer
-	 *
-	 * @return string
-	 */
-	public static function InlineBase64Decode($sBaseString, &$sEndBuffer)
-	{
-		$sEndBuffer = '';
-		$sBaseString = str_replace(array("\r", "\n", "\t"), '', $sBaseString);
-		$iBaseStringLen = strlen($sBaseString);
-		$iBaseStringNormFloorLen = floor($iBaseStringLen / 4) * 4;
-		if ($iBaseStringNormFloorLen < $iBaseStringLen)
-		{
-			$sEndBuffer = substr($sBaseString, $iBaseStringNormFloorLen);
-			$sBaseString = substr($sBaseString, 0, $iBaseStringNormFloorLen);
-		}
-		return \MailSo\Base\Utils::Base64Decode($sBaseString);
-	}
+    /**
+     * @param string $sBaseString
+     * @param string $sEndBuffer
+     *
+     * @return string
+     */
+    public static function InlineBase64Decode($sBaseString, &$sEndBuffer)
+    {
+        // adding missing fill characters (=) if needed
+        $padding = strlen($sBaseString) % 4;
+        if ($padding > 0) {
+            $sBaseString .= str_repeat('=', 4 - $padding);
+        }
+        $sEndBuffer = '';
+        $sBaseString = str_replace(array("\r", "\n", "\t"), '', $sBaseString);
+        $iBaseStringLen = strlen($sBaseString);
+        $iBaseStringNormFloorLen = floor($iBaseStringLen / 4) * 4;
+        if ($iBaseStringNormFloorLen < $iBaseStringLen) {
+            $sEndBuffer = substr($sBaseString, $iBaseStringNormFloorLen);
+            $sBaseString = substr($sBaseString, 0, $iBaseStringNormFloorLen);
+        }
+        return \MailSo\Base\Utils::Base64Decode($sBaseString);
+    }
 
 	/**
 	 * @param string $sQuotedPrintableString
