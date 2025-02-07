@@ -113,6 +113,11 @@ class Binary
      */
     public static function InlineBase64Decode($sBaseString, &$sEndBuffer)
     {
+        // adding missing fill characters (=) if needed
+        $padding = strlen($sBaseString) % 4;
+        if ($padding > 0) {
+            $sBaseString .= str_repeat('=', 4 - $padding);
+        }
         $sEndBuffer = '';
         $sBaseString = str_replace(array("\r", "\n", "\t"), '', $sBaseString);
         $iBaseStringLen = strlen($sBaseString);
