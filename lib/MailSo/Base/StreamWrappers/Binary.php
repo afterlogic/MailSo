@@ -113,6 +113,15 @@ class Binary
      */
     public static function InlineBase64Decode($sBaseString, &$sEndBuffer)
     {
+        // detecting last chunk read for the stream
+        // and adding missing fill characters (=) if needed
+        if ( (strlen($sBaseString) - strlen($sEndBuffer)) < (1024 * 8) ) {
+            $padding = strlen($sBaseString) % 4;
+            if ($padding > 0) {
+                $sBaseString .= str_repeat('=', 4 - $padding);
+            }
+        }
+        
         $sEndBuffer = '';
         $sBaseString = str_replace(array("\r", "\n", "\t"), '', $sBaseString);
         $iBaseStringLen = strlen($sBaseString);
