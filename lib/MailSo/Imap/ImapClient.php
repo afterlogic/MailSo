@@ -204,54 +204,21 @@ class ImapClient extends \MailSo\Net\NetClient
 
         $sLogin = \trim($sLogin);
         $sLogin = \MailSo\Base\Utils::IdnToAscii($sLogin);
-        $sPassword = $sPassword;
 
         $this->sLogginedUser = $sLogin;
 
         try {
-            // TODO
-            if (false && $this->IsSupported('AUTH=CRAM-MD5')) {
-                $this->SendRequest('AUTHENTICATE', array('CRAM-MD5'));
-
-                $aResponse = $this->parseResponseWithValidation();
-                if ($aResponse && \is_array($aResponse) && 0 < \count($aResponse) &&
-                    \MailSo\Imap\Enumerations\ResponseType::CONTINUATION === $aResponse[\count($aResponse) - 1]->ResponseType) {
-                    $oContinuationResponse = null;
-                    foreach ($aResponse as $oResponse) {
-                        if ($oResponse && \MailSo\Imap\Enumerations\ResponseType::CONTINUATION === $oResponse->ResponseType) {
-                            $oContinuationResponse = $oResponse;
-                        }
-                    }
-
-                    if ($oContinuationResponse) {
-                        $sToken = \base64_encode("\0".$sLogin."\0".$sPassword);
-                        if ($this->oLogger) {
-                            $this->oLogger->AddSecret($sToken);
-                        }
-
-                        $this->Logger()->WriteDump($aResponse);
-
-                        $this->sendRaw($sToken, true, '*******');
-                        $this->parseResponseWithValidation();
-                    } else {
-                        // TODO
-                    }
-                }
-            } elseif ($bUseAuthPlainIfSupported && $this->IsSupported('AUTH=PLAIN')) {
+            if ($bUseAuthPlainIfSupported && $this->IsSupported('AUTH=PLAIN')) {
                 $sToken = \base64_encode("\0".$sLogin."\0".$sPassword);
                 if ($this->oLogger) {
                     $this->oLogger->AddSecret($sToken);
                 }
 
-                if ($this->IsSupported('AUTH=SASL-IR') && false) {
-                    $this->SendRequestWithCheck('AUTHENTICATE', array('PLAIN', $sToken));
-                } else {
-                    $this->SendRequest('AUTHENTICATE', array('PLAIN'));
-                    $this->parseResponseWithValidation();
+                $this->SendRequest('AUTHENTICATE', array('PLAIN'));
+                $this->parseResponseWithValidation();
 
-                    $this->sendRaw($sToken, true, '*******');
-                    $this->parseResponseWithValidation();
-                }
+                $this->sendRaw($sToken, true, '*******');
+                $this->parseResponseWithValidation();
             } else {
                 if ($this->oLogger) {
                     $this->oLogger->AddSecret($this->EscapeString($sPassword));
@@ -265,12 +232,6 @@ class ImapClient extends \MailSo\Net\NetClient
                     )
                 );
             }
-            //			else
-            //			{
-            //				$this->writeLogException(
-            //					new \MailSo\Imap\Exceptions\LoginBadMethodException(),
-            //					\MailSo\Log\Enumerations\Type::NOTICE, true);
-            //			}
 
             if (0 < \strlen($sProxyAuthUser)) {
                 $this->SendRequestWithCheck('PROXYAUTH', array($this->EscapeString($sProxyAuthUser)));
@@ -931,7 +892,12 @@ class ImapClient extends \MailSo\Net\NetClient
         }
 
         $this->SendRequest((($bIndexIsUid) ? 'UID ' : '').'FETCH', array($sIndexRange, \array_keys($aFetchItems)));
-        $aResult = $this->validateResponse($this->parseResponse());
+        $aResult = [];
+        try {
+            $aResult = $this->parseResponseWithValidation();
+        } catch (\Exception $oEx) {
+            \Aurora\Api::LogException($oEx);
+        }
         $this->aFetchCallbacks = null;
 
         $aReturn = array();
@@ -1466,7 +1432,7 @@ class ImapClient extends \MailSo\Net\NetClient
      * @param array $aInputStoreItems
      * @param string $sStoreAction
      *
-     * @return \MailSo\Imap\ImapClient
+     * @return \MailSo\Imap\ImapClient|bool
      *
      * @throws \MailSo\Base\Exceptions\InvalidArgumentException
      * @throws \MailSo\Net\Exceptions\Exception
@@ -1665,8 +1631,8 @@ class ImapClient extends \MailSo\Net\NetClient
      */
     private function validateResponse($aResult)
     {
-        $iCnt = \count($aResult);
-        if (!\is_array($aResult) || 0 === $iCnt) {
+        $iCnt = \is_array($aResult) ? \count($aResult) : 0;
+        if (0 === $iCnt) {
             $this->writeLogException(
                 new Exceptions\ResponseNotFoundException(),
                 \MailSo\Log\Enumerations\Type::WARNING,
@@ -1816,8 +1782,6 @@ class ImapClient extends \MailSo\Net\NetClient
         $iBufferEndIndex = 0;
         $iDebugCount = 0;
 
-        $rImapLiteralStream = null;
-
         $bIsGotoDefault = false;
         $bIsGotoLiteral = false;
         $bIsGotoLiteralEnd = false;
@@ -1904,7 +1868,6 @@ class ImapClient extends \MailSo\Net\NetClient
 
                 continue;
             } elseif ($bIsGotoLiteralEnd) {
-                $rImapLiteralStream = null;
                 $sPreviousAtomUpperCase = null;
                 $this->bNeedNext = true;
                 $bIsGotoLiteralEnd = false;
@@ -2016,11 +1979,16 @@ class ImapClient extends \MailSo\Net\NetClient
                         }
 
                         while (true) {
-                            $iClosingPos = \strpos($this->sResponseBuffer, '"', $iClosingPos);
-                            if (false === $iClosingPos) {
-                                break;
+                            while (true) {
+                                $iClosingQuotePos = \strpos($this->sResponseBuffer, '"', $iClosingPos);
+                                if (false === $iClosingQuotePos) {
+                                    $nextBuffer = @\fgets($this->rConnect);
+                                    $this->sResponseBuffer .= $nextBuffer;
+                                } else {
+                                    $iClosingPos = $iClosingQuotePos;
+                                    break;
+                                }
                             }
-
                             // TODO
                             $iClosingPosNext = $iClosingPos + 1;
                             if (
@@ -2051,7 +2019,6 @@ class ImapClient extends \MailSo\Net\NetClient
                         if (false === $iClosingPos) {
                             break;
                         } else {
-                            //							$iSkipClosingPos = 0;
                             $bIsQuotedParsed = true;
                             if ($bTreatAsAtom) {
                                 $sAtomBuilder .= \strtr(
@@ -2144,9 +2111,7 @@ class ImapClient extends \MailSo\Net\NetClient
                         }
 
                         if (null !== $oImapResponse) {
-                            //							if (1 === \count($aList))
                             if (!$bCountOneInited && 1 === \count($aList)) {
-                                //							if (isset($aList[0]) && !isset($aList[1])) // fast 1 === \count($aList)
                                 $bCountOneInited = true;
 
                                 $oImapResponse->Tag = $aList[0];
@@ -2160,9 +2125,7 @@ class ImapClient extends \MailSo\Net\NetClient
                                     $oImapResponse->ResponseType = \MailSo\Imap\Enumerations\ResponseType::UNKNOWN;
                                 }
                             }
-                            //							else if (2 === \count($aList))
                             elseif (!$bCountTwoInited && 2 === \count($aList)) {
-                                //							else if (isset($aList[1]) && !isset($aList[2])) // fast 2 === \count($aList)
                                 $bCountTwoInited = true;
 
                                 $oImapResponse->StatusOrIndex = strtoupper($aList[1]);
