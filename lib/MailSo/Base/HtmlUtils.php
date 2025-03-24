@@ -454,8 +454,14 @@ class HtmlUtils
 
         $sHtmlAttrs = $sBodyAttrs = '';
         $sResult = \MailSo\Base\HtmlUtils::ClearBodyAndHtmlTag($sResult, $sHtmlAttrs, $sBodyAttrs);
-        $sResult = '<div data-x-div-type="body" '.$sBodyAttrs.'>'.$sResult.'</div>';
-        $sResult = '<div data-x-div-type="html" '.$sHtmlAttrs.'>'.$sResult.'</div>';
+
+        // Wrapping provided html with extra divs only if html and body tags were removed
+        if ($sBodyAttrs) {
+            $sResult = '<div data-x-div-type="body" '.$sBodyAttrs.'>'.$sResult.'</div>';
+        }
+        if ($sHtmlAttrs) {
+            $sResult = '<div data-x-div-type="html" '.$sHtmlAttrs.'>'.$sResult.'</div>';
+        }
 
         $sResult = \str_replace(\MailSo\Base\HtmlUtils::$KOS, ':', $sResult);
         $aFoundCIDs = self::$aFoundCIDs;
