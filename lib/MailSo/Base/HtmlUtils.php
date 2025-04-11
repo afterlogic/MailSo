@@ -28,6 +28,11 @@ class HtmlUtils
     public static $maxNestingLevel = 0;
     public static $bCreateHtmlLinksFromTextLinksInDOM = false;
     public static $oDom = null;
+    public static $aForbiddenHtmlTags = [
+        'svg', 'head', 'link',
+        'base', 'meta', 'title', 'style', 'script', 'bgsound', 'keygen', 'source',
+        'object', 'embed', 'applet', 'mocha', 'iframe', 'frame', 'frameset', 'input', 'video', 'audio', 'track', 'portal'
+    ];
 
     /**
      * @access private
@@ -128,17 +133,12 @@ class HtmlUtils
      */
     public static function ClearTags($sHtml)
     {
-        $aRemoveTags = array(
-            'head', 'link', 'base', /*'meta',*/ 'title', 'style', 'script', 'bgsound', 'keygen', 'source',
-            'object', 'embed', 'applet', 'mocha', 'iframe', 'frame', 'frameset', 'video', 'audio'
-        );
-
         $aToRemove = array(
             '/<!doctype[^>]*>/msi',
             '/<\?xml [^>]*\?>/msi'
         );
 
-        foreach ($aRemoveTags as $sTag) {
+        foreach (self::$aForbiddenHtmlTags as $sTag) {
             $aToRemove[] = '\'<'.$sTag.'[^>]*>.*?</[\s]*'.$sTag.'>\'msi';
             $aToRemove[] = '\'<'.$sTag.'[^>]*>\'msi';
             $aToRemove[] = '\'</[\s]*'.$sTag.'[^>]*>\'msi';
@@ -802,9 +802,7 @@ class HtmlUtils
         }
 
         if ($oNode->nodeType === XML_ELEMENT_NODE) {
-            if (\in_array(\strtolower($oNode->tagName), array('svg', 'head', 'link',
-            'base', 'meta', 'title', 'style', 'script', 'bgsound', 'keygen', 'source',
-            'object', 'embed', 'applet', 'mocha', 'iframe', 'frame', 'frameset', 'video', 'audio')) && isset($oNode->parentNode)) {
+            if (\in_array(\strtolower($oNode->tagName), self::$aForbiddenHtmlTags) && isset($oNode->parentNode)) {
                 self::$aNodesToRemove[] = $oNode;
                 return false;
             } else {
