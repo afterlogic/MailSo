@@ -785,7 +785,7 @@ class BodyStructure
         $oBody = null;
         $aBodySubStructure = self::findPartByIndexInArray($aBodyStructure, $sSubPartID);
         if ($aBodySubStructure && \is_array($aBodySubStructure) && isset($aBodySubStructure[8])) {
-            $oBody = self::NewInstance($aBodySubStructure[8], $sSubPartID);
+            $oBody = self::NewInstance($aBodySubStructure[8], $sSubPartID . '.');
         }
 
         return $oBody;
