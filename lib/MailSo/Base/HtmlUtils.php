@@ -444,6 +444,25 @@ class HtmlUtils
                 }
             }
 
+            // Normalize HTML
+            $body = $oDom->getElementsByTagName('body')->item(0);
+            $children = [];
+            $hasTextNode = false;
+            foreach ($body->childNodes as $child) {
+                $children[] = $child;
+                if (!$hasTextNode && $child->nodeType === XML_TEXT_NODE) {
+                    $hasTextNode = true;
+                }
+            }
+            if ($body->childNodes->count() > 1 || $hasTextNode) {
+                $newDiv = $oDom->createElement('div');
+                foreach ($children as $child) {
+                    $newDiv->appendChild($child->cloneNode(true));
+                    $body->removeChild($child);
+                }
+                $body->appendChild($newDiv);
+            }
+
             // Provided argument fixes encoding of non-latin symbols
             $sResult = $oDom->saveHTML((new \DOMXPath($oDom))->query('/')->item(0));
         }
