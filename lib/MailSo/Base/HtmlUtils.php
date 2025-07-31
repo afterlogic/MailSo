@@ -920,10 +920,15 @@ class HtmlUtils
         }
 
         if (isset($oElement->attributes)) {
-            foreach ($oElement->attributes as $sAttributeName => /* @var $oAttributeNode \DOMNode */ $oAttributeNode) {
-                $sAttributeNameLower = \strtolower($sAttributeName);
-                if (!!preg_match('/^\s*on.+$/m', $sAttributeNameLower)) {
-                    @$oElement->removeAttribute($sAttributeNameLower);
+
+            $aAttributeNames = [];
+            foreach ($oElement->attributes as $attr) {
+                $aAttributeNames[] = $attr->name;
+            }
+            foreach ($aAttributeNames as $sAttributeName) {
+                // Remove all attributes starting with "on" (event handlers)
+                if (stripos($sAttributeName, 'on') === 0) {
+                    @$oElement->removeAttribute($sAttributeName);
                 }
             }
         }
