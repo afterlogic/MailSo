@@ -458,6 +458,15 @@ class HtmlUtils
 		$sHtmlAttrs = $sBodyAttrs = '';
 		$sHtml = \MailSo\Base\HtmlUtils::ClearBodyAndHtmlTag($sHtml, $sHtmlAttrs, $sBodyAttrs);
 
+		// fixed wrong comments in HTML
+		$sHtml = preg_replace_callback(
+			'/<\!(?!DOCTYPE|--)(.*?)>/is',
+			function ($matches) {
+				return '<!-- ' . trim($matches[1]) . ' -->';
+			},
+			$sHtml
+		);
+
 		// Dom Part
 		$oDom = \MailSo\Base\HtmlUtils::GetDomFromText($sHtml, $sHtmlAttrs, $sBodyAttrs);
 		unset($sHtml);
