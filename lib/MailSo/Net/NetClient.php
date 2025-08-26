@@ -505,6 +505,9 @@ abstract class NetClient
                 );
             }
         } else {
+            // fixed issue - the disposition field is incorrectly formatted without a space between the quoted value and NIL (e.g., "inline"NIL instead of ("inline" NIL))
+            $this->sResponseBuffer = preg_replace('/"([a-zA-Z0-9_\-]+)"NIL/', '"$1" NIL', $this->sResponseBuffer);
+            
             $iReadedLen = \strlen($this->sResponseBuffer);
             if (null === $mReadLen || $bForceLogin) {
                 $iLimit = 5000; // 5kb
