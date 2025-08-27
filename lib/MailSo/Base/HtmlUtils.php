@@ -428,6 +428,16 @@ class HtmlUtils
 
         $sHtmlAttrs = $sBodyAttrs = '';
         $sHtml = \MailSo\Base\HtmlUtils::ClearBodyAndHtmlTag($sHtml, $sHtmlAttrs, $sBodyAttrs);
+
+		// fixed wrong comments in HTML
+		$sHtml = preg_replace_callback(
+			'/<\!(?!DOCTYPE|--)(.*?)>/is',
+			function ($matches) {
+				return '<!-- ' . trim($matches[1]) . ' -->';
+			},
+			$sHtml
+		);
+
         $sResult = $sHtml;
         // Dom Part
         $sHtml = \MailSo\Base\HtmlUtils::ProtectInlineTags($sHtml);
