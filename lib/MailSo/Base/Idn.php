@@ -18,4 +18,20 @@ class Idn
     {
         return idn_to_utf8($url);
     }
+
+    public function encodeEmail($email)
+    {
+        $sUser = Utils::GetAccountNameFromEmail($email);
+        $sDomain = Utils::GetDomainFromEmail($email);
+
+        return $sUser . '@' . $this->encode($sDomain);
+    }
+
+    public function decodeEmail($email)
+    {
+        $sUser = Utils::GetAccountNameFromEmail($email);
+        $sDomain = Utils::GetDomainFromEmail($email);
+
+        return $sUser . '@' . $this->decode($sDomain);
+    }
 }
