@@ -383,6 +383,50 @@ class HtmlUtils
     }
 
     /**
+     * Sanitizes comments in the provided DOMDocument by removing potentially harmful content.
+     * 
+     * @param \DOMDocument $oDom
+     *
+     * @return void
+     */
+    public static function SanitizeComments(\DOMDocument $oDom): void
+    {
+        $xpath = new \DOMXPath($oDom);
+        $comments = $xpath->query('//comment()');
+
+        foreach ($comments as $comment) {
+            // Skip if not a DOMComment
+            if (!($comment instanceof \DOMComment)) {
+                continue;
+            }
+
+            $data = $comment->data;
+
+            // Remove event handler attributes
+            $cleaned = preg_replace(
+                '/\bon[\w-]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/iu',
+                '',
+                $data
+            );
+
+            // Remove javascript: URLs
+            $cleaned = preg_replace(
+                '/\s+(href|src)\s*=\s*["\']?\s*javascript:[^"\']*/iu',
+                '',
+                $cleaned
+            );
+
+            // Collapse multiple spaces
+            $cleaned = trim(preg_replace('/\s{2,}/', ' ', $cleaned));
+
+            if ($cleaned !== $data) {
+                $comment->data = $cleaned;
+            }
+        }
+    }
+
+
+    /**
      * @param string $sHtml
      * @param bool $bHasExternals = false
      * @param array $aFoundCIDs = array()
@@ -424,6 +468,9 @@ class HtmlUtils
 
         self::$bHasExternals = false;
 
+        // Decode a quoted-printable encoded string into plain HTML
+        $sHtml = quoted_printable_decode($sHtml);
+
         $sHtml = \MailSo\Base\HtmlUtils::ClearTags($sHtml);
 
         $sHtmlAttrs = $sBodyAttrs = '';
@@ -445,6 +492,9 @@ class HtmlUtils
         unset($sHtml);
 
         if ($oDom) {
+            // Sanitize comments to remove potentially harmful content
+            self::SanitizeComments($oDom);
+
             self::$oDom = $oDom;
             self::$maxNestingLevel = (int) @ini_get('xdebug.max_nesting_level');
             self::processNode($oDom, 0);
