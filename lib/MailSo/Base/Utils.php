@@ -759,7 +759,7 @@ END;
             if (!empty($_SERVER['HTTP_USER_AGENT']) && 0 < \strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
                 $sValue = $sAttrName.'="'.\preg_replace('/[+\s]+/', '%20', \urlencode($sValue)).'"';
             } else {
-                $sValue = \MailSo\Base\Utils::AttributeRfc2231Encode($sAttrName, $sValue);
+                $sValue = $sAttrName . "*=UTF-8''" . rawurlencode($sValue);
             }
         } else {
             $sValue = $sAttrName.'="'.\str_replace('"', '\\"', $sValue).'"';
