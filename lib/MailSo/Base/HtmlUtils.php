@@ -468,9 +468,6 @@ class HtmlUtils
 
         self::$bHasExternals = false;
 
-        // Decode a quoted-printable encoded string into plain HTML
-        $sHtml = quoted_printable_decode($sHtml);
-
         $sHtml = \MailSo\Base\HtmlUtils::ClearTags($sHtml);
 
         $sHtmlAttrs = $sBodyAttrs = '';
