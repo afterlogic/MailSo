@@ -383,48 +383,50 @@ class HtmlUtils
     }
 
     /**
-     * Sanitizes comments in the provided DOMDocument by removing potentially harmful content.
+     * Remove comments from html
      * 
      * @param \DOMDocument $oDom
      *
-     * @return void
+     * @return string
      */
-    public static function SanitizeComments(\DOMDocument $oDom): void
+    public static function ClearComments($sHtml): string
     {
-        $xpath = new \DOMXPath($oDom);
-        $comments = $xpath->query('//comment()');
+        // fixed wrong comments in HTML
+		$sHtml = preg_replace_callback(
+			'/<\!(?!DOCTYPE|--)(.*?)>/is',
+			function ($matches) {
+				return '<!-- ' . trim($matches[1]) . ' -->';
+			},
+			$sHtml
+		);
+        libxml_use_internal_errors(true);
 
-        foreach ($comments as $comment) {
-            // Skip if not a DOMComment
-            if (!($comment instanceof \DOMComment)) {
-                continue;
-            }
+        // Load the HTML into the DOMDocument
+        $doc = new \DOMDocument();
+        $doc->loadHTML('<div id="wrapper">'.$sHtml.'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-            $data = $comment->data;
+        $xpath = new \DOMXPath($doc);
+        foreach ($xpath->query('//comment()') as $comment) {
+            $text = $comment->nodeValue;
 
-            // Remove event handler attributes
-            $cleaned = preg_replace(
-                '/\bon[\w-]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/iu',
-                '',
-                $data
-            );
-
-            // Remove javascript: URLs
-            $cleaned = preg_replace(
-                '/\s+(href|src)\s*=\s*["\']?\s*javascript:[^"\']*/iu',
-                '',
-                $cleaned
-            );
-
-            // Collapse multiple spaces
-            $cleaned = trim(preg_replace('/\s{2,}/', ' ', $cleaned));
-
-            if ($cleaned !== $data) {
-                $comment->data = $cleaned;
+            // Remove all comments except conditional comments for IE
+            if (!preg_match('/^\s*\[if/i', $text) && !preg_match('/<!\[endif\]/i', $text)) {
+                $comment->parentNode->removeChild($comment);
             }
         }
-    }
 
+        // Get cleaned HTML without the wrapper
+        $wrapper = $doc->getElementById('wrapper');
+        $cleaned = '';
+        if ($wrapper) {
+            foreach ($wrapper->childNodes as $child) {
+                $cleaned .= $doc->saveHTML($child);
+            }
+        }
+
+        libxml_clear_errors();
+        return $cleaned;
+    }
 
     /**
      * @param string $sHtml
@@ -468,19 +470,11 @@ class HtmlUtils
 
         self::$bHasExternals = false;
 
+        $sHtml = self::ClearComments($sHtml);
         $sHtml = \MailSo\Base\HtmlUtils::ClearTags($sHtml);
 
         $sHtmlAttrs = $sBodyAttrs = '';
         $sHtml = \MailSo\Base\HtmlUtils::ClearBodyAndHtmlTag($sHtml, $sHtmlAttrs, $sBodyAttrs);
-
-		// fixed wrong comments in HTML
-		$sHtml = preg_replace_callback(
-			'/<\!(?!DOCTYPE|--)(.*?)>/is',
-			function ($matches) {
-				return '<!-- ' . trim($matches[1]) . ' -->';
-			},
-			$sHtml
-		);
 
         $sResult = $sHtml;
         // Dom Part
@@ -490,7 +484,7 @@ class HtmlUtils
 
         if ($oDom) {
             // Sanitize comments to remove potentially harmful content
-            self::SanitizeComments($oDom);
+            // self::SanitizeComments($oDom);
 
             self::$oDom = $oDom;
             self::$maxNestingLevel = (int) @ini_get('xdebug.max_nesting_level');
