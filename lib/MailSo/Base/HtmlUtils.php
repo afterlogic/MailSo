@@ -407,12 +407,7 @@ class HtmlUtils
 
         $xpath = new \DOMXPath($doc);
         foreach ($xpath->query('//comment()') as $comment) {
-            $text = $comment->nodeValue;
-
-            // Remove all comments except conditional comments for IE
-            if (!preg_match('/^\s*\[if/i', $text) && !preg_match('/<!\[endif\]/i', $text)) {
-                $comment->parentNode->removeChild($comment);
-            }
+            $comment->parentNode->removeChild($comment);
         }
 
         // Get cleaned HTML without the wrapper
