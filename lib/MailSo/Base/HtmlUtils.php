@@ -58,12 +58,11 @@ class HtmlUtils
             }
         }
 
-        $oDom = new \DOMDocument();
-        $oDom->encoding = 'UTF-8';
+        $oDom = new \DOMDocument('1.0', 'UTF-8');
+
         $oDom->formatOutput = false;
 
         @$oDom->loadHTML(
-            '<'.'?xml version="1.0" encoding="utf-8"?'.'>'.
             '<html '.$sHtmlAttrs.'><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body '.$sBodyAttrs.'>'.$sText.'</body></html>',
             LIBXML_PARSEHUGE
         );
@@ -392,17 +391,17 @@ class HtmlUtils
     public static function ClearComments($sHtml): string
     {
         // fixed wrong comments in HTML
-		$sHtml = preg_replace_callback(
-			'/<\!(?!DOCTYPE|--)(.*?)>/is',
-			function ($matches) {
-				return '<!-- ' . trim($matches[1]) . ' -->';
-			},
-			$sHtml
-		);
+        $sHtml = preg_replace_callback(
+            '/<\!\s*([^-\s][^>]*)>/i',
+            function ($m) {
+                return '<!-- ' . trim($m[1]) . ' -->';
+            },
+            $sHtml
+        );
         libxml_use_internal_errors(true);
 
         // Load the HTML into the DOMDocument
-        $doc = new \DOMDocument();
+        $doc = new \DOMDocument('1.0', 'UTF-8');
         $doc->loadHTML('<div id="wrapper">'.$sHtml.'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
         $xpath = new \DOMXPath($doc);
