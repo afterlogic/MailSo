@@ -147,18 +147,6 @@ class HtmlUtils
     }
 
     /**
-     * @deprecated since version 9.7.5
-     * 
-     * @param string $sHtml
-     *
-     * @return string
-     */
-    public static function ClearOn($sHtml)
-    {
-        return $sHtml;
-    }
-
-    /**
      *
      * @param string $sStyle
      * @param \DOMElement $oElement
