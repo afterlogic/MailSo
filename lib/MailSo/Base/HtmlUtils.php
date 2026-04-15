@@ -76,6 +76,11 @@ class HtmlUtils
         return $oDom;
     }
 
+    public static function GetTextFromDom(\DOMDocument $oDom)
+    {
+        return $oDom->saveHTML($oDom->documentElement);
+    }
+
     /**
      * This method is used to prevent DomDocument class from removing block elements 
      * nested to "a" tags that are inline ones. It allows to convert "a" tags custom tags and bask.
@@ -369,45 +374,31 @@ class HtmlUtils
         );
     }
 
-    /**
-     * Remove comments from html
-     * 
-     * @param \DOMDocument $oDom
-     *
-     * @return string
-     */
-    public static function ClearComments($sHtml): string
+    public static function FixedWrongComments($sHtml)
     {
-        // fixed wrong comments in HTML
-        $sHtml = preg_replace_callback(
+        return preg_replace_callback(
             '/<\!\s*([^-\s][^>]*)>/i',
             function ($m) {
                 return '<!-- ' . trim($m[1]) . ' -->';
             },
             $sHtml
         );
-        libxml_use_internal_errors(true);
+    }
 
-        // Load the HTML into the DOMDocument
-        $doc = new \DOMDocument('1.0', 'UTF-8');
-        $doc->loadHTML('<div id="wrapper">'.$sHtml.'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
+    /**
+     * Remove comments from html
+     * 
+     * @param \DOMDocument $doc
+     *
+     * @return void
+     */
+    public static function ClearComments(\DOMDocument $doc): void
+    {
         $xpath = new \DOMXPath($doc);
+
         foreach ($xpath->query('//comment()') as $comment) {
             $comment->parentNode->removeChild($comment);
         }
-
-        // Get cleaned HTML without the wrapper
-        $wrapper = $doc->getElementById('wrapper');
-        $cleaned = '';
-        if ($wrapper) {
-            foreach ($wrapper->childNodes as $child) {
-                $cleaned .= $doc->saveHTML($child);
-            }
-        }
-
-        libxml_clear_errors();
-        return $cleaned;
     }
 
     /**
@@ -452,7 +443,7 @@ class HtmlUtils
 
         self::$bHasExternals = false;
 
-        $sHtml = self::ClearComments($sHtml);
+        $sHtml = self::FixedWrongComments($sHtml);
         $sHtml = \MailSo\Base\HtmlUtils::ClearTags($sHtml);
 
         $sHtmlAttrs = $sBodyAttrs = '';
@@ -465,11 +456,9 @@ class HtmlUtils
         unset($sHtml);
 
         if ($oDom) {
-            // Sanitize comments to remove potentially harmful content
-            // self::SanitizeComments($oDom);
-
             self::$oDom = $oDom;
             self::$maxNestingLevel = (int) @ini_get('xdebug.max_nesting_level');
+            self::ClearComments($oDom);
             self::processNode($oDom, 0);
             foreach (self::$aNodesToRemove as $oElement) {
                 if (isset($oElement->parentNode)) {
@@ -496,8 +485,7 @@ class HtmlUtils
                 $body->appendChild($newDiv);
             }
 
-            // Provided argument fixes encoding of non-latin symbols
-            $sResult = $oDom->saveHTML((new \DOMXPath($oDom))->query('/')->item(0));
+            $sResult = self::GetTextFromDom($oDom);
         }
         $sResult = \MailSo\Base\HtmlUtils::ProtectInlineTags($sResult, true);
 
@@ -648,7 +636,7 @@ class HtmlUtils
             }
         }
 
-        $sResult = $oDom->saveHTML();
+        $sResult = self::GetTextFromDom($oDom);
         $sResult = \MailSo\Base\HtmlUtils::ProtectInlineTags($sResult, true);
         unset($oDom);
 
