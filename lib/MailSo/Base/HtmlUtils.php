@@ -522,6 +522,7 @@ class HtmlUtils
     public static function BuildHtml($sHtml, &$aFoundCids = array(), &$mFoundDataURL = null, &$aFoundedContentLocationUrls = array())
     {
         $sHtml = \MailSo\Base\HtmlUtils::ProtectInlineTags($sHtml);
+
         $oDom = \MailSo\Base\HtmlUtils::GetDomFromText($sHtml);
         unset($sHtml);
 
@@ -640,11 +641,22 @@ class HtmlUtils
         $sResult = \MailSo\Base\HtmlUtils::ProtectInlineTags($sResult, true);
         unset($oDom);
 
+        $sResult = \MailSo\Base\HtmlUtils::ExtractBodyContent($sResult);
         $sResult = \MailSo\Base\HtmlUtils::ClearTags($sResult);
         $sResult = \MailSo\Base\HtmlUtils::ClearBodyAndHtmlTag($sResult);
 
         return '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>'.
             '<body>'.\trim($sResult).'</body></html>';
+    }
+
+    public static function ExtractBodyContent($sHtml) {
+        $aMatches = array();
+
+        if (preg_match('/<body[^>]*>(.*?)<\/body>/ims', $sHtml, $aMatches)) {
+            return trim($aMatches[1]);
+        }
+
+        return $sHtml;
     }
 
     /**
