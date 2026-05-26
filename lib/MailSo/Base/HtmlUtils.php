@@ -1054,7 +1054,7 @@ class HtmlUtils
 				}
 				else if ('data:image/' === \strtolower(\substr(\trim($sSrc), 0, 11)))
 				{
-					$oElement->setAttribute('src', $sSrc);
+					$oElement->setAttribute('src', \MailSo\Base\HtmlUtils::NormalizeDataImageUrl($sSrc));
 				}
 				else
 				{
@@ -1110,5 +1110,29 @@ class HtmlUtils
 				$oElement->removeAttribute('cursor');
 			}
 		}
+	}
+
+	/**
+	 * Collapses whitespace and URL-encoded line breaks in data: image base64 payloads.
+	 * DOM saveHTML() may turn newlines inside src into %0D%0A, which breaks Base64Decode.
+	 *
+	 * @param string $sDataUrl
+	 * @return string
+	 */
+	public static function NormalizeDataImageUrl($sDataUrl)
+	{
+		$sDataUrl = (string) $sDataUrl;
+		if ('data:image/' !== \strtolower(\substr(\trim($sDataUrl), 0, 11)))
+		{
+			return $sDataUrl;
+		}
+		$aMatch = array();
+		if (!\preg_match('#^data:([^;,]+)((?:;[^,]+)*),(.*)$#is', $sDataUrl, $aMatch))
+		{
+			return $sDataUrl;
+		}
+		$sPayload = \rawurldecode($aMatch[3]);
+		$sPayload = \preg_replace('/\s+/', '', $sPayload);
+		return 'data:' . $aMatch[1] . $aMatch[2] . ',' . $sPayload;
 	}
 }
