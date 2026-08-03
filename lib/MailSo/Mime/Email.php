@@ -82,92 +82,117 @@ class Email
         $sEmail = '';
         $sComment = '';
 
-        $bInName = false;
-        $bInAddress = false;
-        $bInComment = false;
+        $iAngleStart = \strpos($sEmailAddress, '<');
+        $iAngleEnd = \strpos($sEmailAddress, '>');
 
-        $iStartIndex = 0;
-        $iEndIndex = 0;
-        $iCurrentIndex = 0;
+        if ($iAngleStart !== false && $iAngleEnd !== false && $iAngleEnd > $iAngleStart) {
+            $sName = \trim(\substr($sEmailAddress, 0, $iAngleStart));
+            $sEmail = \trim(\substr($sEmailAddress, $iAngleStart + 1, $iAngleEnd - $iAngleStart - 1));
+            $sComment = \trim(\substr($sEmailAddress, $iAngleEnd + 1));
 
-        while ($iCurrentIndex < \strlen($sEmailAddress)) {
-            switch ($sEmailAddress[$iCurrentIndex]) {
-                //				case '\'':
-                case '"':
-                    //$sQuoteChar = $sEmailAddress{$iCurrentIndex};
-                    if ((!$bInName) && (!$bInAddress) && (!$bInComment)) {
-                        $bInName = true;
-                        $iStartIndex = $iCurrentIndex;
-                    } elseif ((!$bInAddress) && (!$bInComment)) {
-                        $iEndIndex = $iCurrentIndex;
-                        $sName = \substr($sEmailAddress, $iStartIndex + 1, $iEndIndex - $iStartIndex - 1);
-                        $sEmailAddress = \substr_replace($sEmailAddress, '', $iStartIndex, $iEndIndex - $iStartIndex + 1);
-                        $iEndIndex = 0;
-                        $iCurrentIndex = 0;
-                        $iStartIndex = 0;
-                        $bInName = false;
-                    }
-                    break;
-                case '<':
-                    if ((!$bInName) && (!$bInAddress) && (!$bInComment)) {
-                        if ($iCurrentIndex > 0 && \strlen($sName) === 0) {
-                            $sName = \substr($sEmailAddress, 0, $iCurrentIndex);
+            if (\preg_match('/^\\((.*)\\)$/', $sComment, $m)) {
+                $sComment = \trim($m[1]);
+            }
+
+            if (strlen($sName) > 0) {
+                $sName = \trim($sName, '"');
+                $sName = \trim($sName, '\'');
+            }
+
+            if (strlen($sComment) > 0) {
+                $sComment = \trim($sComment, '()');
+            }
+        } else {
+            $bInName = false;
+            $bInAddress = false;
+            $bInComment = false;
+
+            $iStartIndex = 0;
+            $iEndIndex = 0;
+            $iCurrentIndex = 0;
+
+            while ($iCurrentIndex < \strlen($sEmailAddress)) {
+                switch ($sEmailAddress[$iCurrentIndex]) {
+                    case '"':
+                        if ((!$bInName) && (!$bInAddress) && (!$bInComment)) {
+                            $bInName = true;
+                            $iStartIndex = $iCurrentIndex;
+                        } elseif ((!$bInAddress) && (!$bInComment)) {
+                            $iEndIndex = $iCurrentIndex;
+                            $sName = \substr($sEmailAddress, $iStartIndex + 1, $iEndIndex - $iStartIndex - 1);
+                            $sEmailAddress = \substr_replace($sEmailAddress, '', $iStartIndex, $iEndIndex - $iStartIndex + 1);
+                            $iEndIndex = 0;
+                            $iCurrentIndex = 0;
+                            $iStartIndex = 0;
+                            $bInName = false;
                         }
+                        break;
+                    case '<':
+                        if ((!$bInName) && (!$bInAddress) && (!$bInComment)) {
+                            if ($iCurrentIndex > 0 && \strlen($sName) === 0) {
+                                $sName = \substr($sEmailAddress, 0, $iCurrentIndex);
+                            }
 
-                        $bInAddress = true;
-                        $iStartIndex = $iCurrentIndex;
-                    }
-                    break;
-                case '>':
-                    if ($bInAddress) {
-                        $iEndIndex = $iCurrentIndex;
-                        $sEmail = \substr($sEmailAddress, $iStartIndex + 1, $iEndIndex - $iStartIndex - 1);
-                        $sEmailAddress = \substr_replace($sEmailAddress, '', $iStartIndex, $iEndIndex - $iStartIndex + 1);
-                        $iEndIndex = 0;
-                        $iCurrentIndex = 0;
-                        $iStartIndex = 0;
-                        $bInAddress = false;
-                    }
-                    break;
-                case '(':
-                    if ((!$bInName) && (!$bInAddress) && (!$bInComment)) {
-                        $bInComment = true;
-                        $iStartIndex = $iCurrentIndex;
-                    }
-                    break;
-                case ')':
-                    if ($bInComment) {
-                        $iEndIndex = $iCurrentIndex;
-                        $sComment = \substr($sEmailAddress, $iStartIndex + 1, $iEndIndex - $iStartIndex - 1);
-                        $sEmailAddress = \substr_replace($sEmailAddress, '', $iStartIndex, $iEndIndex - $iStartIndex + 1);
-                        $iEndIndex = 0;
-                        $iCurrentIndex = 0;
-                        $iStartIndex = 0;
-                        $bInComment = false;
-                    }
-                    break;
-                case '\\':
-                    $iCurrentIndex++;
-                    break;
+                            $bInAddress = true;
+                            $iStartIndex = $iCurrentIndex;
+                        }
+                        break;
+                    case '>':
+                        if ($bInAddress) {
+                            $iEndIndex = $iCurrentIndex;
+                            $sEmail = \substr($sEmailAddress, $iStartIndex + 1, $iEndIndex - $iStartIndex - 1);
+                            $sEmailAddress = \substr_replace($sEmailAddress, '', $iStartIndex, $iEndIndex - $iStartIndex + 1);
+                            $iEndIndex = 0;
+                            $iCurrentIndex = 0;
+                            $iStartIndex = 0;
+                            $bInAddress = false;
+                        }
+                        break;
+                    case '(':
+                        if ((!$bInName) && (!$bInAddress) && (!$bInComment)) {
+                            $bInComment = true;
+                            $iStartIndex = $iCurrentIndex;
+                        }
+                        break;
+                    case ')':
+                        if ($bInComment) {
+                            $iEndIndex = $iCurrentIndex;
+                            $sComment = \substr($sEmailAddress, $iStartIndex + 1, $iEndIndex - $iStartIndex - 1);
+                            $sEmailAddress = \substr_replace($sEmailAddress, '', $iStartIndex, $iEndIndex - $iStartIndex + 1);
+                            $iEndIndex = 0;
+                            $iCurrentIndex = 0;
+                            $iStartIndex = 0;
+                            $bInComment = false;
+                        }
+                        break;
+                    case '\\':
+                        $iCurrentIndex++;
+                        break;
+                }
+
+                $iCurrentIndex++;
             }
 
-            $iCurrentIndex++;
-        }
+            if (\strlen($sEmail) === 0) {
+                $aRegs = array('');
+                if (\preg_match('/[^@\s]+@\S+/i', $sEmailAddress, $aRegs) && isset($aRegs[0])) {
+                    $sEmail = $aRegs[0];
+                } else {
+                    $sName = $sEmailAddress;
+                }
+            }
 
-        if (\strlen($sEmail) === 0) {
-            $aRegs = array('');
-            if (\preg_match('/[^@\s]+@\S+/i', $sEmailAddress, $aRegs) && isset($aRegs[0])) {
-                $sEmail = $aRegs[0];
-            } else {
-                $sName = $sEmailAddress;
+            if ((\strlen($sEmail) > 0) && (\strlen($sName) == 0) && (\strlen($sComment) == 0)) {
+                $sName = \str_replace($sEmail, '', $sEmailAddress);
+            }
+
+            $sEmail = \trim(\trim($sEmail), '<>');
+
+            if (strlen($sName) === 0 && strlen($sComment) > 0) {
+                $sName = $sComment;
+                $sComment = '';
             }
         }
-
-        if ((\strlen($sEmail) > 0) && (\strlen($sName) == 0) && (\strlen($sComment) == 0)) {
-            $sName = \str_replace($sEmail, '', $sEmailAddress);
-        }
-
-        $sEmail = \trim(\trim($sEmail), '<>');
 
         $sName = \MailSo\Base\Utils::CustomTrim(\trim($sName), '"'); //standard trim removes more than necessary
         //$sName = \trim(\trim($sName), '"');
