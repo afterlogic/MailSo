@@ -203,7 +203,7 @@ class HtmlUtils
             {
                 // skip
             }
-            else */if (\in_array($sName, array('behavior')) ||
+            else */if (\in_array($sName, array('behavior', '-moz-binding')) ||
                 ('cursor' === $sName && !\in_array(\strtolower($sValue), array('none', 'cursor'))) ||
                 ('display' === $sName && 'none' === \strtolower($sValue)) ||
                 \preg_match('/expression/i', $sValue) ||
@@ -970,7 +970,7 @@ class HtmlUtils
         foreach ($aNotJsAttrs as $sAttrName) {
             if ($oElement->hasAttribute($sAttrName)) {
                 $sHref = \trim($oElement->getAttribute($sAttrName));
-                if (substr($sHref, 0, 11) === 'javascript:') {
+                if (self::IsDangerousUrl($sHref)) {
                     $oElement->setAttribute($sAttrName, 'javascript:void(0)');
                 } elseif ('a' === $sTagNameLower || 'a-custom' === $sTagNameLower) {
                     $oElement->setAttribute('rel', 'external');
@@ -1057,5 +1057,36 @@ class HtmlUtils
                 $oElement->removeAttribute('cursor');
             }
         }
+    }
+
+    /**
+     * Checks whether a URL value uses a dangerous protocol that could lead to XSS
+     * (e.g. javascript:, vbscript:, data:text/html).
+     *
+     * The check is case-insensitive, decodes HTML entities, and removes
+     * whitespace inside the scheme to catch variants like "java\tscript:".
+     *
+     * @param string $sUrl
+     * @return bool
+     */
+    public static function IsDangerousUrl($sUrl)
+    {
+        if (0 === \strlen($sUrl)) {
+            return false;
+        }
+
+        $sDecoded = \html_entity_decode($sUrl, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $sDecoded = \ltrim($sDecoded);
+        $sNormalized = \preg_replace('/\s+/', '', $sDecoded);
+        $sLower = \strtolower($sNormalized);
+
+        $aDangerousSchemes = ['javascript:', 'vbscript:', 'data:'];
+        foreach ($aDangerousSchemes as $sScheme) {
+            if (0 === \strpos($sLower, $sScheme)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
