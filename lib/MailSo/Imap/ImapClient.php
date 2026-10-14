@@ -180,6 +180,21 @@ class ImapClient extends \MailSo\Net\NetClient
     }
 
     /**
+     * @param \MailSo\Imap\Exceptions\NegativeResponseException $oException
+     *
+     * @return bool
+     */
+    private function isTemporaryLoginFailure($oException)
+    {
+        $oResponse = $oException->GetLastResponse();
+        $sCode = $oResponse && \is_array($oResponse->OptionalResponse) && isset($oResponse->OptionalResponse[0])
+            ? \strtoupper((string) $oResponse->OptionalResponse[0])
+            : '';
+
+        return \in_array($sCode, array('UNAVAILABLE', 'INUSE', 'SERVERBUG'), true);
+    }
+
+    /**
      * @param string $sLogin
      * @param string $sPassword
      * @param string $sProxyAuthUser = ''
@@ -237,6 +252,12 @@ class ImapClient extends \MailSo\Net\NetClient
                 $this->SendRequestWithCheck('PROXYAUTH', array($this->EscapeString($sProxyAuthUser)));
             }
         } catch (\MailSo\Imap\Exceptions\NegativeResponseException $oException) {
+            if ($this->isTemporaryLoginFailure($oException)) {
+                // Server-side problem (RFC 5530 response codes), not a credentials error:
+                // keep it distinct so that the client does not log the user out.
+                $this->writeLogException($oException, \MailSo\Log\Enumerations\Type::ERROR, true);
+            }
+
             $this->writeLogException(
                 new \MailSo\Imap\Exceptions\LoginBadCredentialsException($oException->GetResponses()),
                 \MailSo\Log\Enumerations\Type::NOTICE,
